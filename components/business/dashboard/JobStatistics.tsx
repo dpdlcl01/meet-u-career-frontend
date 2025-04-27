@@ -1,28 +1,33 @@
-import { FileText, AlertCircle, CheckCircle } from "lucide-react"
+import { BusinessDashboardData } from "@/lib/fetchBusinessDashboard";
+import { FileText, AlertCircle, CheckCircle } from "lucide-react";
 
-export const JobStatistics = () => {
+interface Props {
+  data: BusinessDashboardData;
+}
+
+export const JobStatistics = ({ data }: Props) => {
   const stats = [
     {
-      title: "진행 공고",
-      count: 12,
+      title: "전체 공고",
+      count: data.totalJobPostings,
       icon: <FileText className="h-5 w-5 text-gray-600" />,
     },
     {
       title: "진행중 공고",
-      count: 8,
+      count: data.activeJobPostings,
       icon: <FileText className="h-5 w-5 text-blue-500" />,
     },
     {
       title: "마감임박 공고",
-      count: 3,
+      count: data.nearingDeadlineJobPostings,
       icon: <AlertCircle className="h-5 w-5 text-red-500" />,
     },
     {
-      title: "일자리형 공고",
-      count: 1,
+      title: "마감된 공고",
+      count: data.closedJobPostings,
       icon: <CheckCircle className="h-5 w-5 text-gray-600" />,
     },
-  ]
+  ];
 
   return (
     <div className="grid grid-cols-4 gap-4 mb-6">
@@ -39,5 +44,5 @@ export const JobStatistics = () => {
         </div>
       ))}
     </div>
-  )
-}
+  );
+};

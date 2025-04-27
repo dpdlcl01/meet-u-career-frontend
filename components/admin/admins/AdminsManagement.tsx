@@ -1,63 +1,28 @@
 "use client"
 
+import { useEffect, useState } from "react"
 import { Plus } from "lucide-react"
-import { useState } from "react"
 import AdminsStats from "./AdminsStats"
 import AdminsSearch from "./AdminsSearch"
 import AdminsTable from "./AdminsTable"
 import AdminModal, { type AdminData } from "./AdminModal"
+import { fetchAdmins, createAdmin, updateAdmin, deleteAdmin } from "@/lib/adminApi"
 
 export default function AdminsManagement() {
+  const [admins, setAdmins] = useState<AdminData[]>([])
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [currentAdmin, setCurrentAdmin] = useState<AdminData | undefined>(undefined)
   const [modalMode, setModalMode] = useState<"add" | "edit">("add")
-  const [admins, setAdmins] = useState<AdminData[]>([
-    {
-      id: 1,
-      name: "김관리",
-      email: "admin1@saramin.co.kr",
-      phone: "010-1234-5678",
-      department: "시스템관리",
-      position: "팀장",
-      level: 1,
-    },
-    {
-      id: 2,
-      name: "이부장",
-      email: "admin2@saramin.co.kr",
-      phone: "010-2345-6789",
-      department: "회원관리",
-      position: "부장",
-      level: 1,
-    },
-    {
-      id: 3,
-      name: "박차장",
-      email: "admin3@saramin.co.kr",
-      phone: "010-3456-7890",
-      department: "기업검수",
-      position: "차장",
-      level: 2,
-    },
-    {
-      id: 4,
-      name: "최대리",
-      email: "admin4@saramin.co.kr",
-      phone: "010-4567-8901",
-      department: "공고관리",
-      position: "대리",
-      level: 2,
-    },
-    {
-      id: 5,
-      name: "정사원",
-      email: "admin5@saramin.co.kr",
-      phone: "010-5678-9012",
-      department: "고객지원",
-      position: "사원",
-      level: 2,
-    },
-  ])
+  const [searchKeyword, setSearchKeyword] = useState("")
+
+  const loadAdmins = async () => {
+    const data = await fetchAdmins(searchKeyword)
+    setAdmins(data)
+  }
+
+  useEffect(() => {
+    loadAdmins()
+  }, [searchKeyword])
 
   const handleOpenAddModal = () => {
     setCurrentAdmin(undefined)
@@ -73,22 +38,46 @@ export default function AdminsManagement() {
 
   const handleCloseModal = () => {
     setIsModalOpen(false)
+    setCurrentAdmin(undefined)
   }
 
-  const handleSaveAdmin = (adminData: AdminData) => {
-    if (modalMode === "add") {
-      // Add new admin
-      const newAdmin = {
-        ...adminData,
-        id: Math.max(0, ...admins.map((a) => a.id || 0)) + 1,
-        level: 2, // Default to level 2 for new admins
+  const handleSaveAdmin = async (adminData: Partial<AdminData> & { password?: string }) => {
+    try {
+      if (modalMode === "add") {
+        const dataToSend = {
+          name: adminData.name,
+          email: adminData.email,
+          password: adminData.password,
+          role: adminData.role, // ⭐️ level을 role로 변환
+        }
+        await createAdmin(dataToSend)
+      } else if (modalMode === "edit" && currentAdmin) {
+        const dataToSend = {
+          id: currentAdmin.id!,
+          name: adminData.name,
+          email: adminData.email,
+          password: adminData.password,
+          role: adminData.role, // ⭐️ 수정할 때도 level → role 변환
+        }
+        await updateAdmin(dataToSend)
       }
-      setAdmins([...admins, newAdmin])
-    } else {
-      // Update existing admin
-      setAdmins(admins.map((admin) => (admin.id === currentAdmin?.id ? { ...admin, ...adminData } : admin)))
+      await loadAdmins()
+      handleCloseModal()
+    } catch (error: any) {
+      console.error("⭐ 저장 실패", error.response?.data || error.message)
+      alert("저장 실패: " + (error.response?.data?.msg || error.message))
     }
-    setIsModalOpen(false)
+  }
+
+  const handleDeleteAdmin = async (id: number) => {
+    if (confirm("정말 삭제하시겠습니까?")) {
+      await deleteAdmin(id)
+      await loadAdmins()
+    }
+  }
+
+  const handleSearch = (keyword: string) => {
+    setSearchKeyword(keyword)
   }
 
   return (
@@ -99,14 +88,13 @@ export default function AdminsManagement() {
       </div>
 
       <AdminsStats
-        level1Count={admins.filter((a) => a.level === 1).length}
-        level2Count={admins.filter((a) => a.level === 2).length}
+        level1Count={admins.filter((a) => a.role === 1).length}
+        level2Count={admins.filter((a) => a.role === 2).length}
       />
 
       <div className="bg-white rounded-lg shadow mt-6 p-6">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
-          <AdminsSearch />
-
+          <AdminsSearch onSearch={handleSearch} />
           <button
             onClick={handleOpenAddModal}
             className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors"
@@ -116,7 +104,7 @@ export default function AdminsManagement() {
           </button>
         </div>
 
-        <AdminsTable admins={admins} onEdit={handleOpenEditModal} />
+        <AdminsTable admins={admins} onEdit={handleOpenEditModal} onDelete={handleDeleteAdmin} />
       </div>
 
       <AdminModal

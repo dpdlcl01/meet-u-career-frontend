@@ -1,3 +1,7 @@
+// components/admin/AdminsStats.tsx
+
+"use client"
+
 import { Shield } from "lucide-react"
 
 interface AdminsStatsProps {

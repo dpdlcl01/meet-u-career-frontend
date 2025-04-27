@@ -1,8 +1,13 @@
-import Image from "next/image"
-import Link from "next/link"
-import { Building, MapPin, Users } from "lucide-react"
+import Image from "next/image";
+import Link from "next/link";
+import { Building, MapPin, Users } from "lucide-react";
+import { BusinessDashboardData } from "@/lib/fetchBusinessDashboard";
 
-export const CompanyProfile = () => {
+interface Props {
+  data: BusinessDashboardData;
+}
+
+export const CompanyProfile = ({ data }: Props) => {
   return (
     <div className="bg-white rounded-md shadow-sm p-6 mb-6">
       <div className="flex items-start justify-between">
@@ -17,25 +22,25 @@ export const CompanyProfile = () => {
             />
           </div>
           <div>
-            <h1 className="text-lg font-medium">(주)서울인</h1>
+            <h1 className="text-lg font-medium">{data.companyName}</h1>
             <div className="flex items-center mt-2 text-sm text-gray-600">
               <div className="flex items-center mr-4">
                 <Building className="h-4 w-4 mr-1 text-blue-500" />
-                <span>IT/인터넷/서비스</span>
+                <span>{data.industry}</span>
               </div>
               <div className="flex items-center">
                 <MapPin className="h-4 w-4 mr-1 text-blue-500" />
-                <span>서울 구로구 디지털로 34길 43</span>
+                <span>{data.address}</span>
               </div>
             </div>
             <div className="flex items-center mt-1 text-sm text-gray-600">
               <div className="flex items-center mr-4">
                 <Users className="h-4 w-4 mr-1 text-blue-500" />
-                <span>500명+</span>
+                <span>{data.employeeScale}</span>
               </div>
               <div className="flex items-center">
                 <span className="text-blue-500 mr-1">•</span>
-                <span>2004년 07월 설립</span>
+                <span>{data.foundedDate}</span>
               </div>
             </div>
           </div>
@@ -48,5 +53,5 @@ export const CompanyProfile = () => {
         </Link>
       </div>
     </div>
-  )
-}
+  );
+};

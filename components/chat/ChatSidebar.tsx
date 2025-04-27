@@ -1,59 +1,17 @@
 "use client"
-
+import { useChatRooms } from "@/hooks/useChatRooms"
 import { Search } from "lucide-react"
 import Image from "next/image"
-
-interface ChatItem {
-  id: string
-  name: string
-  company: string
-  position: string
-  lastMessage: string
-  time: string
-  avatar: string
-  unread: boolean
-}
-
 interface ChatSidebarProps {
   selectedChatId: string | null
   onSelectChat: (id: string) => void
 }
-
 export function ChatSidebar({ selectedChatId, onSelectChat }: ChatSidebarProps) {
-  // Mock chat data
-  const chats: ChatItem[] = [
-    {
-      id: "1",
-      name: "(주)사람인HR 채용담당자",
-      company: "(주)사람인HR",
-      position: "채용담당자",
-      lastMessage: "안녕하세요, 포지션에 관심 있으신가요?",
-      time: "10분 전",
-      avatar: "/mystical-forest-spirit.png",
-      unread: false,
-    },
-    {
-      id: "2",
-      name: "테크스타트(주) 인사팀",
-      company: "테크스타트(주)",
-      position: "인사팀",
-      lastMessage: "면접 일정 조율 부탁드립니다.",
-      time: "1시간 전",
-      avatar: "/mystical-forest-spirit.png",
-      unread: false,
-    },
-    {
-      id: "3",
-      name: "글로벌소프트(주) 면접팀",
-      company: "글로벌소프트(주)",
-      position: "면접팀",
-      lastMessage: "면접 결과를 안내드립니다.",
-      time: "3시간 전",
-      avatar: "/mystical-forest-spirit.png",
-      unread: false,
-    },
-  ]
-
+  const { chatRooms, loading, error, markRoomAsRead } = useChatRooms()
+  const handleSelectChat = (id: string) => {
+    onSelectChat(id)
+    markRoomAsRead(Number(id))  // 클릭 시 읽음 처리 API 호출
+  }
   return (
     <div className="w-[365px] border-r border-gray-200 flex flex-col h-full">
       <div className="p-4 border-b border-gray-200">
@@ -69,30 +27,53 @@ export function ChatSidebar({ selectedChatId, onSelectChat }: ChatSidebarProps) 
           />
         </div>
       </div>
-
       <div className="flex-1 overflow-y-auto bg-gray-50">
-        {chats.map((chat) => (
+        {/* 로딩 중 */}
+        {loading && (
+          <div className="flex items-center justify-center h-full text-gray-500">
+            채팅방 불러오는 중...
+          </div>
+        )}
+        {/* 에러 발생 */}
+        {error && (
+          <div className="flex items-center justify-center h-full text-red-500">
+            {error}
+          </div>
+        )}
+        {/* 데이터 있을 때 */}
+        {!loading && !error && chatRooms.length === 0 && (
+          <div className="flex items-center justify-center h-full text-gray-500">
+            채팅방이 없습니다.
+          </div>
+        )}
+        {/* 채팅방 리스트 */}
+        {!loading && !error && chatRooms.map((chat) => (
           <div
-            key={chat.id}
-            onClick={() => onSelectChat(chat.id)}
-            className={`p-4 flex items-start cursor-pointer hover:bg-gray-100 ${selectedChatId === chat.id ? "bg-gray-100" : ""
-              }`}
+            key={chat.roomId}
+            onClick={() => handleSelectChat(chat.roomId.toString())}
+            className={`p-4 flex items-start cursor-pointer hover:bg-gray-100 ${
+              selectedChatId === chat.roomId.toString() ? "bg-gray-100" : ""
+            }`}
           >
-            <div className="flex-shrink-0">
+            <div className="flex-shrink-0 relative">
               <Image
-                src={chat.avatar || "/images/etc/placeholder.svg"}
-                alt={chat.name}
+                src="/mystical-forest-spirit.png"
+                alt="Company Logo"
                 width={40}
                 height={40}
                 className="rounded-full"
               />
+              {/* 안읽은 메시지 수 뱃지 */}
+              {chat.unreadCount > 0 && (
+                <span className="absolute -top-1 -right-1 flex items-center justify-center w-5 h-5 rounded-full bg-red-500 text-white text-xs">
+                  {chat.unreadCount}
+                </span>
+              )}
             </div>
             <div className="ml-3 flex-1 min-w-0">
-              <div className="flex justify-between items-start">
-                <p className="text-sm font-medium text-gray-900 truncate">{chat.name}</p>
-                <p className="text-xs text-gray-500 whitespace-nowrap">{chat.time}</p>
-              </div>
-              <p className="text-sm text-gray-500 truncate mt-1">{chat.lastMessage}</p>
+              <p className="text-sm font-medium text-gray-900 truncate">
+                {chat.companyId}번 회사
+              </p>
             </div>
           </div>
         ))}

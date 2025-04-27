@@ -16,7 +16,7 @@ export const fetchMyInfo = async () => {
     const response = await apiClient.get<any>("/api/user/me", {
       withCredentials: !isLocalhost,
       headers: {
-        Authorization: `Bearer ${useAuthStore.getState().accessToken}`, // 최신 값 가져오기
+        Authorization: accessToken ? `Bearer ${accessToken}` : "",
       },
     });
 

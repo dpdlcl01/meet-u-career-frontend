@@ -1,14 +1,14 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
-import axios from "axios";
+import { apiClient } from "@/api/apiClient"; // 🔄 apiClient 사용
 import { InterviewTabs } from "./InterviewTabs";
 import { InterviewStatusTab } from "./InterviewStatusTab";
-import  InterviewReviewTab from "./InterviewReviewTab";
+import InterviewReviewTab from "./InterviewReviewTab";
 import { InterviewStats } from "./InterviewStats";
 import { ReviewModal } from "./review/ReviewModal";
 import { ReviewDetailModal } from "./ReviewDetailModal";
-import { Interview } from "@/types/interview"; // ✅ 타입 통일 import
+import { Interview } from "@/types/interview";
 
 // ✅ 리뷰 타입
 interface Review {
@@ -42,14 +42,14 @@ export function InterviewsContent() {
 
   const fetchInterviews = async () => {
     try {
-      const token = localStorage.getItem("accessToken");
-      if (!token) return;
+      const res = await apiClient.get("/api/personal/interviews");
+      console.log("✅ 인터뷰 목록 확인:", res.data);
 
-      const res = await axios.get("/api/personal/interviews", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const reviewableRes = await apiClient.post(
+        "/api/personal/interview-reviews/reviewable-list",
+        res.data.data
+      );
 
-      const reviewableRes = await axios.post("/api/personal/interview-reviews/reviewable-list", res.data.data);
       const reviewableMap = new Map<number, boolean>();
       reviewableRes.data.data.forEach((dto: any) => {
         reviewableMap.set(dto.applicationId, dto.canWriteReview);
@@ -58,7 +58,6 @@ export function InterviewsContent() {
       const transformed: Interview[] = res.data.data.map((item: any) => ({
         ...item,
         canWriteReview: reviewableMap.get(item.applicationId) ?? false,
-        // ✅ status를 number로 명확히 보정
         status:
           typeof item.status === "string"
             ? item.status === "completed"
@@ -77,13 +76,7 @@ export function InterviewsContent() {
 
   const fetchReviews = async () => {
     try {
-      const token = localStorage.getItem("accessToken");
-      if (!token) return;
-
-      const res = await axios.get("/api/personal/interview-reviews", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
+      const res = await apiClient.get("/api/personal/interview-reviews");
       setReviews(res.data.data);
     } catch (err) {
       console.error("❌ 리뷰 목록 불러오기 실패", err);
@@ -127,20 +120,26 @@ export function InterviewsContent() {
     setViewingReview(null);
   };
 
-  const counts = useMemo(() => ({
-    status: interviews.length,
-    reviews: reviews.length,
-  }), [interviews, reviews]);
+  const counts = useMemo(
+    () => ({
+      status: interviews.length,
+      reviews: reviews.length,
+    }),
+    [interviews, reviews]
+  );
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto px-4">
       <h1 className="text-2xl font-bold text-gray-900 pt-6">면접 현황</h1>
 
-      {/* ✅ 통계에 인터뷰 리스트 넘기기 */}
       <InterviewStats interviews={interviews} />
 
       <div className="bg-white rounded-lg shadow-sm p-6">
-        <InterviewTabs activeTab={activeTab} onTabChange={setActiveTab} counts={counts} />
+        <InterviewTabs
+          activeTab={activeTab}
+          onTabChange={setActiveTab}
+          counts={counts}
+        />
 
         {activeTab === "reviews" ? (
           <InterviewReviewTab

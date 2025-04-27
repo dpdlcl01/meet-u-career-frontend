@@ -1,7 +1,6 @@
 "use client"
 
 import type React from "react"
-
 import { X } from "lucide-react"
 import { useEffect, useRef, useState } from "react"
 
@@ -9,10 +8,7 @@ export interface AdminData {
   id?: number
   name: string
   email: string
-  phone: string
-  department: string
-  position: string
-  level?: number
+  role?: number
   password?: string
   confirmPassword?: string
 }
@@ -29,9 +25,7 @@ export default function AdminModal({ isOpen, onClose, onSave, initialData, mode 
   const [formData, setFormData] = useState<AdminData>({
     name: "",
     email: "",
-    phone: "",
-    department: "",
-    position: "",
+    role: 2,
     password: "",
     confirmPassword: "",
   })
@@ -49,9 +43,7 @@ export default function AdminModal({ isOpen, onClose, onSave, initialData, mode 
       setFormData({
         name: "",
         email: "",
-        phone: "",
-        department: "",
-        position: "",
+        role: 2,
         password: "",
         confirmPassword: "",
       })
@@ -82,13 +74,20 @@ export default function AdminModal({ isOpen, onClose, onSave, initialData, mode 
 
   if (!isOpen) return null
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target
-    setFormData((prev) => ({ ...prev, [name]: value }))
+    setFormData((prev) => ({
+      ...prev,
+      [name]: name === "level" ? parseInt(value) : value,
+    }))
   }
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
+    if (formData.password !== formData.confirmPassword) {
+      alert("비밀번호가 일치하지 않습니다.")
+      return
+    }
     onSave(formData)
   }
 
@@ -142,54 +141,23 @@ export default function AdminModal({ isOpen, onClose, onSave, initialData, mode 
               required
             />
           </div>
-
+          <div className="grid grid-cols-2 gap-4 mb-4">                      
+          </div>
           <div className="mb-4">
-            <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-1">
-              전화번호
+            <label htmlFor="level" className="block text-sm font-medium text-gray-700 mb-1">
+              관리자 레벨
             </label>
-            <input
-              type="tel"
-              id="phone"
-              name="phone"
-              value={formData.phone}
+            <select
+              id="level"
+              name="level"
+              value={formData.role}
               onChange={handleChange}
-              placeholder="예: 010-1234-5678"
               className="w-full p-2 border rounded-md"
               required
-            />
-          </div>
-
-          <div className="grid grid-cols-2 gap-4 mb-4">
-            <div>
-              <label htmlFor="department" className="block text-sm font-medium text-gray-700 mb-1">
-                부서
-              </label>
-              <input
-                type="text"
-                id="department"
-                name="department"
-                value={formData.department}
-                onChange={handleChange}
-                placeholder="부서를 입력하세요"
-                className="w-full p-2 border rounded-md"
-                required
-              />
-            </div>
-            <div>
-              <label htmlFor="position" className="block text-sm font-medium text-gray-700 mb-1">
-                직급
-              </label>
-              <input
-                type="text"
-                id="position"
-                name="position"
-                value={formData.position}
-                onChange={handleChange}
-                placeholder="직급을 입력하세요"
-                className="w-full p-2 border rounded-md"
-                required
-              />
-            </div>
+            >
+              <option value={1}>레벨 1 (최고 관리자)</option>
+              <option value={2}>레벨 2 (일반 관리자)</option>
+            </select>
           </div>
 
           <div className="mb-4">

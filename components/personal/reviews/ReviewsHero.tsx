@@ -1,6 +1,21 @@
-import { Search } from "lucide-react"
+"use client"
 
-export const ReviewsHero = () => {
+import { Search } from "lucide-react"
+import { useEffect, useState } from "react"
+import { useDebounce } from "@/app/hooks/useDebounce"
+
+interface Props {
+  onSearch: (keyword: string) => void
+}
+
+export const ReviewsHero = ({ onSearch }: Props) => {
+  const [input, setInput] = useState("")
+  const debouncedInput = useDebounce(input, 400)
+
+  useEffect(() => {
+    onSearch(debouncedInput.trim())
+  }, [debouncedInput, onSearch])
+
   return (
     <div className="bg-white py-12">
       <div className="max-w-[1200px] mx-auto px-4">
@@ -15,6 +30,8 @@ export const ReviewsHero = () => {
             <div className="relative max-w-md">
               <input
                 type="text"
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
                 placeholder="어떤 기업의 기업리뷰가 궁금하세요?"
                 className="w-full pl-4 pr-10 py-3 border rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
               />

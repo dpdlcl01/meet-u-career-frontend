@@ -4,7 +4,7 @@ import Link from "next/link"
 import { Menu, Bell, MessageSquare } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { NotificationDropdown } from "./NotificationDropdown"
-import { ChatDropdown } from "./ChatDropdown"
+import { ChatDropdown } from "@/components/personal/mypage/ChatDropdown"
 import { ProfileDropdown } from "./ProfileDropdown"
 import { useState, useRef, useEffect } from "react"
 

@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from "react"
 import { X, ImageIcon } from "lucide-react"
 import axios from "axios"
+import { useUserStore } from "@/store/useUserStore"
 
 interface CreatePostModalProps {
   onClose: () => void
@@ -21,7 +22,7 @@ interface CreatePostModalProps {
 export const CreatePostModal = ({
   onClose,
   profileImageUrl,
-  userName,
+  userName = "",
   initialContent = "",
   initialTag = null,
   initialImageUrl = null,
@@ -29,6 +30,7 @@ export const CreatePostModal = ({
   isEditMode = false,
   postId,
 }: CreatePostModalProps) => {
+  const { userInfo } = useUserStore();
   const [content, setContent] = useState(initialContent)
   const [selectedTag, setSelectedTag] = useState<string | null>(initialTag)
   const [selectedImage, setSelectedImage] = useState<File | null>(null)
@@ -88,7 +90,7 @@ export const CreatePostModal = ({
       const json: any = {
         content: content,
         tagId: TAG_NAME_TO_ID[selectedTag],
-        accountId: 1,
+        accountId: userInfo?.accountId,
         title: "임시 제목",
         id: isEditMode ? postId : undefined,
       };
@@ -97,7 +99,7 @@ export const CreatePostModal = ({
         if (selectedImage) {
           formData.append("image", selectedImage);
         } else if (previewImage && imageKey) {
-          if (!previewImage.includes("/profile.png") && !previewImage.includes("generic-app-icon.png")) {
+          if (!previewImage.includes("/images/etc/profile.png") && !previewImage.includes("generic-app-icon.png")) {
             json.postImageKey = imageKey;
           }
         } else {
@@ -115,11 +117,20 @@ export const CreatePostModal = ({
       }
       console.log("FormData 보내기 직전:", [...formData.entries()]);
 
+      const token = sessionStorage.getItem('accessToken');
       if (isEditMode) {
-        await axios.post("/api/personal/community/posts/edit", formData);
+        await axios.post("/api/personal/community/posts/edit", formData, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
         alert("게시글이 수정되었습니다!");
       } else {
-        await axios.post("/api/personal/community/posts/create", formData);
+        await axios.post("/api/personal/community/posts/create", formData, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
         alert("게시글이 등록되었습니다!");
       }
 
@@ -160,7 +171,7 @@ export const CreatePostModal = ({
         {/* 프로필 + 닉네임 */}
         <div className="flex items-center gap-3 p-4">
           <img
-            src={profileImageUrl || "/images/etc/default_profile.png"}
+            src={profileImageUrl || "/images/etc/profile.png"}
             alt="Profile"
             className="w-10 h-10 rounded-full object-cover"
           />

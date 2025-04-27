@@ -2,7 +2,18 @@
 
 import { useEffect, useRef } from "react"
 
-export function ApplicationStatusChart() {
+interface Summary {
+  passedDocument: number
+  interview1st: number
+  finalAccepted: number
+  rejected: number
+}
+
+interface Props {
+  data: Summary
+}
+
+export function ApplicationStatusChart({ data }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
 
   useEffect(() => {
@@ -12,24 +23,21 @@ export function ApplicationStatusChart() {
     const ctx = canvas.getContext("2d")
     if (!ctx) return
 
-    // Set canvas dimensions
     const size = 150
     canvas.width = size
     canvas.height = size
 
-    // Data for the pie chart
-    const data = [
-      { value: 3, color: "#10B981" }, // Green - 서류 통과
-      { value: 2, color: "#3B82F6" }, // Blue - 1차 면접
-      { value: 1, color: "#8B5CF6" }, // Purple - 최종 면접
-      { value: 4, color: "#EF4444" }, // Red - 불합격
-    ]
+    const chartData = [
+      { value: data.passedDocument, color: "#569ad6" },
+      { value: data.interview1st, color: "#d66156" },
+      { value: data.finalAccepted, color: "#d68556" },
+      { value: data.rejected, color: "#8356d6" },
+    ].filter(item => item.value > 0)
 
-    const total = data.reduce((sum, item) => sum + item.value, 0)
+    const total = chartData.reduce((sum, item) => sum + item.value, 0)
 
-    // Draw the pie chart
     let startAngle = 0
-    data.forEach((item) => {
+    chartData.forEach((item) => {
       const sliceAngle = (2 * Math.PI * item.value) / total
 
       ctx.beginPath()
@@ -39,32 +47,47 @@ export function ApplicationStatusChart() {
 
       ctx.fillStyle = item.color
       ctx.fill()
-
       startAngle += sliceAngle
     })
 
-    // Draw the center circle (white)
     ctx.beginPath()
     ctx.arc(size / 2, size / 2, size / 4, 0, 2 * Math.PI)
     ctx.fillStyle = "white"
     ctx.fill()
 
-    // Draw the text in the center
-    ctx.font = "bold 24px Arial"
+    ctx.font = "bold 20px Arial"
     ctx.fillStyle = "#1F2937"
     ctx.textAlign = "center"
     ctx.textBaseline = "middle"
     ctx.fillText(total.toString(), size / 2, size / 2 - 5)
 
-    // Draw the "건" text
     ctx.font = "12px Arial"
     ctx.fillStyle = "#6B7280"
     ctx.fillText("건", size / 2, size / 2 + 15)
-  }, [])
+  }, [data])
 
   return (
-    <div className="flex justify-center">
-      <canvas ref={canvasRef} width="150" height="150"></canvas>
+    <div className="bg-white shadow-md rounded-xl p-6 w-full">
+      <div className="flex flex-col items-center">
+        <canvas ref={canvasRef} width="150" height="150" />
+
+        <div className="grid grid-cols-2 gap-2 mt-4 text-sm w-full max-w-[180px]">
+          <LegendDot color="#569ad6" label="서류 통과" value={data.passedDocument} />
+          <LegendDot color="#d66156" label="1차 면접" value={data.interview1st} />
+          <LegendDot color="#d68556" label="최종 합격" value={data.finalAccepted} />
+          <LegendDot color="#8356d6" label="불합격" value={data.rejected} />
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function LegendDot({ color, label, value }: { color: string, label: string, value: number }) {
+  return (
+    <div className="flex items-center">
+      <span className="w-3 h-3 rounded-full mr-2" style={{ backgroundColor: color }}></span>
+      <span className="text-xs text-gray-600">{label}</span>
+      <span className="ml-auto text-xs font-medium">{value}건</span>
     </div>
   )
 }

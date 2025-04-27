@@ -5,6 +5,8 @@ import axios from "axios";
 import { Post } from "./Post";
 import { PostFilters } from "./PostFilters";
 import { CreatePostInput } from "./CreatePostInput";
+import { CreatePostModal } from "./CreatePostModal"; // ✅ 모달 직접 가져옴
+import { useUserStore } from "@/store/useUserStore"; // ✅ 추가: user 정보 가져오기
 
 interface PostFeedProps {
   selectedHashtags: string[];
@@ -32,21 +34,34 @@ interface PostData {
   commentCount: number;
   tagId: number;
   profileImageUrl: string | null;
-  createdAt: string; // ✅ createdAt 추가
+  createdAt: string;
   isLiked?: boolean;
 }
 
-export const PostFeed = ({ selectedHashtags, onOpenFilterModal, onOpenCreatePostModal }: PostFeedProps) => {
+export const PostFeed = ({ selectedHashtags, onOpenFilterModal }: PostFeedProps) => {
+  const { userInfo } = useUserStore();
+  const profileImageUrl = userInfo?.profileImage || "/images/etc/profile.png";
+  const userName = userInfo?.name ?? "";
+
   const [posts, setPosts] = useState<PostData[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [isCreatePostModalOpen, setIsCreatePostModalOpen] = useState(false); // ✅ 모달 상태 관리
 
   useEffect(() => {
     const fetchPosts = async () => {
       try {
-        const res = await axios.get("http://localhost:8080/api/personal/community/posts/all-posts");
+        const token = sessionStorage.getItem('accessToken');
+        if (!token) {
+          console.error("AccessToken 없음! API 요청 중단");
+          return;
+        }
+        const res = await axios.get("/api/personal/community/posts/all-posts", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
         const posts = res.data.data.posts;
-        console.log("불러온 posts:", posts);
         setPosts(posts);
       } catch (e) {
         console.error("게시글을 불러오지 못했습니다.", e);
@@ -79,15 +94,24 @@ export const PostFeed = ({ selectedHashtags, onOpenFilterModal, onOpenCreatePost
         onSelectHashtag={handleSelectHashtag}
         onSelectAll={handleSelectAll}
       />
-      <CreatePostInput onOpenCreatePostModal={onOpenCreatePostModal} />
-      {posts
-        .filter(post => {
-          if (selectedTags.length === 0) return true;
-          const tagName = TAG_ID_TO_NAME[post.tagId];
-          const hashtag = tagName ? `#${tagName}` : "";
-          return selectedTags.includes(hashtag);
-        })
-        .map(post => {
+      
+      {/* ✅ CreatePostInput은 onOpen만 받음 */}
+      <CreatePostInput onOpen={() => setIsCreatePostModalOpen(true)} />
+
+      {isCreatePostModalOpen && (
+        <CreatePostModal
+          onClose={() => setIsCreatePostModalOpen(false)}
+          profileImageUrl={profileImageUrl}
+          userName={userName}
+        />
+      )}
+
+      {posts?.filter(post => {
+        if (selectedTags.length === 0) return true;
+        const tagName = TAG_ID_TO_NAME[post.tagId];
+        const hashtag = tagName ? `#${tagName}` : "";
+        return selectedTags.includes(hashtag);
+      }).map(post => {
           const tagName = TAG_ID_TO_NAME[post.tagId];
           const hashtags = tagName ? [`#${tagName}`] : [];
 
@@ -98,7 +122,7 @@ export const PostFeed = ({ selectedHashtags, onOpenFilterModal, onOpenCreatePost
                 id: post.id,
                 author: {
                   name: `user${post.accountId}`,
-                  avatar: post.profileImageUrl || "/profile.png",
+                  avatar: post.profileImageUrl || "/images/etc/profile.png",
                 },
                 content: post.content,
                 image: post.postImageUrl,
@@ -109,7 +133,7 @@ export const PostFeed = ({ selectedHashtags, onOpenFilterModal, onOpenCreatePost
                 tags: hashtags,
                 likers: [],
                 commentsList: [],
-                createdAt: post.createdAt, // createdAt 추가
+                createdAt: post.createdAt,
               }}
             />
           );

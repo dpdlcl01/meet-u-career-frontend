@@ -1,63 +1,98 @@
 "use client"
 
 import { useState, useRef, type ChangeEvent } from "react"
+import { Upload, X, Check, ChevronRight, Eye, EyeOff } from "lucide-react"
+import { apiClient } from "@/api/apiClient"
+import { useRouter } from "next/navigation"
+import { z } from "zod"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { z } from "zod"
-import { Upload, X, Check, ChevronRight } from "lucide-react"
 
+// window 타입 확장 (다음 주소 API)
+declare global {
+  interface Window {
+    daum: any;
+  }
+}
+
+
+
+// Zod 스키마 정의
 const businessRegisterSchema = z.object({
   businessNumber: z
     .string()
     .min(1, "사업자등록번호를 입력해주세요")
-    .regex(/^\d{3}-\d{2}-\d{5}$/, "올바른 사업자등록번호 형식이 아닙니다 (예: 123-45-67890)"),
+    .regex(/^[0-9]{3}-[0-9]{2}-[0-9]{5}$/, "올바른 형식: 123-45-67890"),
   companyName: z.string().min(1, "기업명을 입력해주세요"),
   representativeName: z.string().min(1, "대표자명을 입력해주세요"),
   companyAddress: z.string().min(1, "회사 주소를 입력해주세요"),
   detailAddress: z.string().optional(),
+  businessFileKey: z.string().optional(),
+  businessFileName: z.string().optional(),
   foundingDate: z
     .string()
-    .min(1, "설립일을 입력해주세요")
+    .min(8, "설립일을 입력해주세요")
     .regex(/^\d{8}$/, "YYYYMMDD 형식으로 입력해주세요"),
   companyType: z.enum(["일반", "벤처기업", "공공기관/비영리법인"]),
-  userId: z
+  loginId: z
     .string()
     .min(4, "4~20자의 영문, 숫자, 특수문자 '_'사용가능")
     .max(20, "4~20자의 영문, 숫자, 특수문자 '_'사용가능")
-    .regex(/^[a-zA-Z0-9_]+$/, "4~20자의 영문, 숫자, 특수문자 '_'사용가능"),
+    .regex(/^[a-zA-Z0-9_]+$/, "올바른 아이디 형식이 아닙니다"),
   password: z
     .string()
     .min(8, "8~16자리/영문 대소문자, 숫자, 특수문자 조합")
     .max(16, "8~16자리/영문 대소문자, 숫자, 특수문자 조합")
     .regex(
       /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,16}$/,
-      "8~16자리/영문 대소문자, 숫자, 특수문자 조합",
+      "비밀번호 형식이 올바르지 않습니다"
     ),
-  email: z.string().email("이메일 주소를 입력해주세요."),
+  confirmPassword: z.string(),
+  email: z.string().email("올바른 이메일 주소를 입력해주세요."),
   website: z.string().optional(),
-  allConsent: z.boolean().optional(),
-  serviceConsent: z.boolean().default(false),
-  privacyConsent: z.boolean().default(false),
-  marketingEmailConsent: z.boolean().default(false),
-  marketingSmsConsent: z.boolean().default(false),
-  thirdPartyConsent: z.boolean().default(false),
-})
+  industry: z.string().min(1, "업종은 필수 입력입니다."),
+  allConsent: z.boolean(),
+  serviceConsent: z.boolean(),
+  privacyConsent: z.boolean(),
+  marketingEmailConsent: z.boolean(),
+  marketingSmsConsent: z.boolean(),
+  thirdPartyConsent: z.boolean(),
+}).refine((data) => data.password === data.confirmPassword, {
+  message: "비밀번호가 일치하지 않습니다.",
+  path: ["confirmPassword"],
+});
 
-type BusinessRegisterFormData = z.infer<typeof businessRegisterSchema>
-
+export type BusinessRegisterFormData = z.infer<typeof businessRegisterSchema>;
 export const BusinessRegistrationForm = () => {
-  const [fileUploaded, setFileUploaded] = useState(false)
-  const [fileName, setFileName] = useState("")
-  const fileInputRef = useRef<HTMLInputElement>(null)
 
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [fileUploaded, setFileUploaded] = useState(false);
+  const [fileName, setFileName] = useState("");
+  const [isUploading, setIsUploading] = useState(false);
+  const [companyAddress, setCompanyAddress] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [loginIdMsg, setUserIdMsg] = useState<string | null>(null);
+  const [emailCheckMsg, setEmailCheckMsg] = useState<string | null>(null);
+  const [laterVerification, setLaterVerification] = useState(false);
+  
+  // 이메일 인증 관련 상태
+  const [emailCertificationRequested, setEmailCertificationRequested] = useState(false);
+  const [certificationCode, setCertificationCode] = useState("");
+  const [certificationVerified, setCertificationVerified] = useState(false);
+  const [timeLeft, setTimeLeft] = useState(0);
+
+  // 폼 설정
   const {
     register,
     handleSubmit,
-    formState: { errors, isSubmitting },
     setValue,
+    trigger,
+    formState: { errors, isSubmitting },
     watch,
   } = useForm<BusinessRegisterFormData>({
     resolver: zodResolver(businessRegisterSchema),
+    mode: "onChange",
     defaultValues: {
       companyType: "일반",
       allConsent: false,
@@ -67,39 +102,91 @@ export const BusinessRegistrationForm = () => {
       marketingSmsConsent: false,
       thirdPartyConsent: false,
     },
-  })
+  });
 
-  const businessNumber = watch("businessNumber")
-  const allConsent = watch("allConsent")
-
-  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (file) {
-      const fileExtension = file.name.split(".").pop()?.toLowerCase()
-      const allowedExtensions = ["jpg", "jpeg", "png", "pdf", "tiff"]
-
-      if (allowedExtensions.includes(fileExtension || "")) {
-        setFileUploaded(true)
-        setFileName(file.name)
-      } else {
-        alert("JPG, PNG, PDF, TIFF 파일만 업로드 가능합니다.")
-        if (fileInputRef.current) {
-          fileInputRef.current.value = ""
+  // 주소 검색 처리
+  const handleAddressSearch = () => {
+    if (typeof window === "undefined" || !window.daum || !window.daum.Postcode) {
+      alert("주소 검색 기능이 아직 로드되지 않았습니다. 잠시 후 다시 시도해주세요.");
+      return;
+    }
+  
+    new window.daum.Postcode({
+      oncomplete: function (data: any) {
+        const addr = data.roadAddress || data.jibunAddress;
+        if (addr) {
+          setValue("companyAddress", addr); 
+          setCompanyAddress(addr);
+          trigger("companyAddress");
         }
-      }
-    }
-  }
+      },
+    }).open();
+  };
 
+  // 체크박스 전체 동의 처리
+  const allConsent = watch("allConsent")
+  const businessNumber = watch("businessNumber")
+
+  // 파일업로드 처리
+  const handleFileUpload = async (file: File) => {
+    setIsUploading(true);
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      const res = await apiClient.post<{ data: string }>("/api/account/business/upload", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      setValue("businessFileKey", res.data.data);
+      setValue("businessFileName", file.name);
+      setIsUploading(false);
+    } catch (e) {
+      alert("파일 업로드 실패");
+      setFileUploaded(false);
+      setFileName("");
+      setIsUploading(false);
+    }
+  };
+  
+  // 파일 선택 처리
+  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const ext = file.name.split(".").pop()?.toLowerCase();
+    const allowed = ["jpg", "jpeg", "png", "pdf", "tiff"];
+    if (!allowed.includes(ext || "")) {
+      alert("JPG, PNG, PDF, TIFF 파일만 업로드 가능합니다.");
+      if (fileInputRef.current) fileInputRef.current.value = "";
+      return;
+    }
+    setFileUploaded(true);
+    setFileName(file.name);
+    handleFileUpload(file);
+  };
+  
+  // 사업자등록번호 입력 형식 처리
   const handleBusinessNumberChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value
-    setValue("businessNumber", value)
-
-    // Format the business number as user types (123-45-67890)
-    if (value.length === 10) {
-      setValue("businessNumber", `${value.slice(0, 3)}-${value.slice(3, 5)}-${value.slice(5)}`)
+    // 숫자만 추출
+    let value = e.target.value.replace(/[^0-9]/g, '');
+    
+    // 10자리를 넘어가면 잘라내기
+    if (value.length > 10) {
+      value = value.substring(0, 10);
     }
-  }
+    
+    // 하이픈 추가 형식 적용 (3-2-5)
+    let formattedValue = value;
+    if (value.length > 5) {
+      formattedValue = `${value.substring(0, 3)}-${value.substring(3, 5)}-${value.substring(5)}`;
+    } else if (value.length > 3) {
+      formattedValue = `${value.substring(0, 3)}-${value.substring(3)}`;
+    }
+    
+    setValue("businessNumber", formattedValue);
+    trigger("businessNumber");
+  };
 
+  // 전체 동의 체크박스 처리
   const handleAllConsentChange = (e: ChangeEvent<HTMLInputElement>) => {
     const checked = e.target.checked
     setValue("allConsent", checked)
@@ -110,22 +197,131 @@ export const BusinessRegistrationForm = () => {
     setValue("thirdPartyConsent", checked)
   }
 
+  // 파일 제거 처리
   const handleRemoveFile = () => {
     setFileUploaded(false)
     setFileName("")
+    setValue("businessFileKey", undefined)
+    setValue("businessFileName", undefined)
     if (fileInputRef.current) {
       fileInputRef.current.value = ""
     }
   }
 
-  const onSubmit = async (data: BusinessRegisterFormData) => {
-    console.log(data)
-    // Here you would normally submit the form data to your API
-    // For demo purposes, we'll just log it to the console
-    alert("기업회원 가입이 완료되었습니다.")
+  // 이메일 중복 확인
+  const handleEmailCheck = async () => {
+    const email = watch("email");
+    
+    if (!email) return alert("이메일을 입력해주세요.");
+    
+    try {
+      const res = await apiClient.post("/api/account/business/check/email", { email });
+      const isAvailable = !res.data.data;
+      setEmailCheckMsg(isAvailable ? "사용 가능한 이메일입니다." : "이미 등록된 이메일입니다.");
+    } catch (err) {
+      console.error("이메일 중복 확인 오류", err);
+      setEmailCheckMsg("확인 중 오류가 발생했습니다.");
+    }
+  };
+
+  // 이메일 인증코드 요청
+  const handleEmailCertification = async () => {
+  const email = watch("email");
+  const companyName = watch("companyName"); // 추가
+
+  if (!email || !companyName) { // 추가
+    alert("이메일과 회사명을 입력해주세요.");
+    return;
   }
 
-  // Tip Section Component to avoid duplication
+  try {
+    const res = await apiClient.post("/api/account/business/certification", {
+      name: companyName, // 수정
+      email: email,
+    });
+    if (res.data.count === 1) {
+      setEmailCertificationRequested(true);
+      setTimeLeft(300);
+      alert("인증코드가 이메일로 발송되었습니다.");
+    } else {
+      alert(res.data.msg || "이메일 인증 요청 실패");
+    }
+  } catch {
+    alert("이메일 인증 요청 실패");
+  }
+};
+
+
+  // 인증코드 확인
+  const handleVerifyCertification = async () => {
+    const email = watch("email");
+    if (!email) return;
+    try {
+      const res = await apiClient.post("/api/account/business/certification/verify", {
+        email,
+        code: certificationCode,
+      });
+      if (res.data.count === 1) {
+        setCertificationVerified(true);
+        setEmailCertificationRequested(false);
+        alert("이메일 인증 완료!");
+      } else {
+        alert(res.data.msg || "인증 실패");
+      }
+    } catch {
+      alert("이메일 인증 실패");
+    }
+  };
+
+  // 다음에 인증 체크박스 처리
+  const handleLaterVerificationChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setLaterVerification(e.target.checked);
+  };
+
+  // 폼 제출 처리
+  const onSubmit = async (data: BusinessRegisterFormData) => {
+    // 필수 약관 확인
+    if (!data.serviceConsent || !data.privacyConsent) {
+      alert("필수 약관에 모두 동의해야 가입할 수 있습니다.");
+      return;
+    }
+
+    // 파일 업로드 검증 (다음에 인증하지 않을 경우)
+    if (!laterVerification && !data.businessFileKey) {
+      alert("사업자등록증명원을 업로드하거나 '다음에 인증할게요'를 선택해주세요.");
+      return;
+
+
+    }
+
+    const payload = {
+      ...data,
+      foundingDate: `${data.foundingDate.slice(0, 4)}-${data.foundingDate.slice(4, 6)}-${data.foundingDate.slice(6, 8)}`,
+      website: data.website || "",
+    };
+    
+ 
+    
+    try {
+      const response = await apiClient.post("/api/account/business/signup", {
+        ...data,
+        foundingDate: `${data.foundingDate.slice(0, 4)}-${data.foundingDate.slice(4, 6)}-${data.foundingDate.slice(6, 8)}`,
+        website: data.website || "",
+      });
+  
+      if (response.data.success && response.data.count === 1) {
+        alert("기업회원 가입이 완료되었습니다!");
+        router.push("/login"); // 로그인 페이지로 이동
+      } else {
+        alert(response.data.msg || "회원가입에 실패했습니다.");
+      }
+    } catch (error) {
+      console.error("회원가입 오류", error);
+      alert("서버 오류가 발생했습니다.");
+    }
+  };
+  
+  // 팁 섹션 컴포넌트 (중복 제거용)
   const TipSection = () => (
     <div className="border rounded-md p-6">
       <div className="flex items-start mb-4">
@@ -144,7 +340,16 @@ export const BusinessRegistrationForm = () => {
               <span className="font-medium">발급 받을 수 있는 서류</span>가 기재되어 있어요!
             </p>
           </div>
-          <button className="w-full mt-2 py-2 border border-gray-300 rounded-md text-sm hover:bg-gray-50">
+          <button
+            type="button"
+            className="w-full mt-2 py-2 border border-gray-300 rounded-md text-sm hover:bg-gray-50"
+            onClick={() =>
+              window.open(
+                "https://www.gov.kr/mw/AA020InfoCappView.do?CappBizCD=12100000016",
+                "_blank"
+              )
+            }
+          >
             사업자등록증명원 발급
           </button>
         </div>
@@ -182,23 +387,23 @@ export const BusinessRegistrationForm = () => {
         </div>
       </div>
     </div>
-  )
+  );
 
   return (
     <div className="w-full max-w-[1200px] mx-auto px-4 py-8">
-      <h1 className="text-center text-xl font-medium mb-8">사람인 통합 기업회원 가입</h1>
+      <h1 className="text-center text-xl font-medium mb-8">Meet U 통합 기업회원 가입</h1>
 
-      {/* Main container with responsive layout */}
+      {/* 메인 컨테이너 (반응형 레이아웃) */}
       <div className="flex flex-col lg:flex-row gap-8">
-        {/* Tip Section - Left side on desktop, hidden on mobile */}
+        {/* 팁 섹션 - 데스크탑에서는 왼쪽, 모바일에서는 숨김 */}
         <div className="hidden lg:block lg:w-1/3">
           <TipSection />
         </div>
 
-        {/* Form Section - Right side on desktop, full width on mobile */}
+        {/* 폼 섹션 - 데스크탑에서는 오른쪽, 모바일에서는 전체 너비 */}
         <div className="lg:w-2/3">
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-            {/* Business Registration Number */}
+            {/* 사업자등록번호 */}
             <div>
               <label htmlFor="businessNumber" className="block text-sm font-medium text-gray-700 mb-1">
                 사업자등록번호
@@ -219,7 +424,7 @@ export const BusinessRegistrationForm = () => {
               </p>
             </div>
 
-            {/* Business Verification */}
+            {/* 기업 인증 */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">기업 인증</label>
               <div className="border border-blue-100 rounded-md p-4 bg-blue-50">
@@ -267,9 +472,16 @@ export const BusinessRegistrationForm = () => {
                     type="button"
                     onClick={() => fileInputRef.current?.click()}
                     className="w-full bg-blue-600 text-white rounded-md py-2.5 hover:bg-blue-700 transition-colors flex items-center justify-center"
+                    disabled={isUploading}
                   >
-                    <Upload className="h-4 w-4 mr-2" />
-                    파일 선택
+                    {isUploading ? (
+                      <div className="h-5 w-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    ) : (
+                      <>
+                        <Upload className="h-4 w-4 mr-2" />
+                        파일 선택
+                      </>
+                    )}
                   </button>
                 </div>
 
@@ -278,6 +490,8 @@ export const BusinessRegistrationForm = () => {
                     type="checkbox"
                     id="laterVerification"
                     className="h-4 w-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500"
+                    checked={laterVerification}
+                    onChange={handleLaterVerificationChange}
                   />
                   <label htmlFor="laterVerification" className="ml-2 text-xs text-gray-600">
                     다음에 인증할게요
@@ -286,12 +500,12 @@ export const BusinessRegistrationForm = () => {
               </div>
             </div>
 
-            {/* Tip Section for mobile - appears above Company Name */}
+            {/* 모바일용 팁 섹션 */}
             <div className="block lg:hidden">
               <TipSection />
             </div>
 
-            {/* Company Name */}
+            {/* 기업명 */}
             <div>
               <label htmlFor="companyName" className="block text-sm font-medium text-gray-700 mb-1">
                 기업명
@@ -308,7 +522,7 @@ export const BusinessRegistrationForm = () => {
               {errors.companyName && <p className="text-red-500 text-xs mt-1">{errors.companyName.message}</p>}
             </div>
 
-            {/* Representative Name */}
+            {/* 대표자 */}
             <div>
               <label htmlFor="representativeName" className="block text-sm font-medium text-gray-700 mb-1">
                 대표자
@@ -327,7 +541,7 @@ export const BusinessRegistrationForm = () => {
               )}
             </div>
 
-            {/* Company Address */}
+            {/* 회사 주소 */}
             <div>
               <label htmlFor="companyAddress" className="block text-sm font-medium text-gray-700 mb-1">
                 회사 주소
@@ -345,6 +559,7 @@ export const BusinessRegistrationForm = () => {
                 />
                 <button
                   type="button"
+                  onClick={handleAddressSearch}
                   className="ml-2 px-4 py-2.5 border border-gray-300 text-gray-700 text-sm rounded-md hover:bg-gray-50"
                 >
                   주소
@@ -360,7 +575,7 @@ export const BusinessRegistrationForm = () => {
               {errors.companyAddress && <p className="text-red-500 text-xs mt-1">{errors.companyAddress.message}</p>}
             </div>
 
-            {/* Founding Date */}
+            {/* 설립일 */}
             <div>
               <label htmlFor="foundingDate" className="block text-sm font-medium text-gray-700 mb-1">
                 설립일
@@ -377,7 +592,7 @@ export const BusinessRegistrationForm = () => {
               {errors.foundingDate && <p className="text-red-500 text-xs mt-1">{errors.foundingDate.message}</p>}
             </div>
 
-            {/* Company Type */}
+            {/* 기업구분 */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">기업구분</label>
               <div className="flex flex-wrap gap-4">
@@ -411,178 +626,268 @@ export const BusinessRegistrationForm = () => {
               </div>
             </div>
 
-            {/* Username */}
+            {/* 업종 */}
             <div>
-              <label htmlFor="userId" className="block text-sm font-medium text-gray-700 mb-1">
+              <label
+                htmlFor="industry"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
+                업종
+              </label>
+              <input
+                type="text"
+                id="industry"
+                {...register("industry")}
+                placeholder="예: IT, 제조업, 금융 등"
+                className={`w-full px-3 py-2.5 border ${
+                  errors.industry ? "border-red-500" : "border-gray-300"
+                } rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500`}
+              />
+              {errors.industry && (
+                <p className="text-red-500 text-xs mt-1">{errors.industry.message}</p>
+              )}
+            </div>
+
+            {/* 아이디 */}
+            <div>
+              <label htmlFor="loginId" className="block text-sm font-medium text-gray-700 mb-1">
                 아이디
               </label>
               <input
                 type="text"
-                id="userId"
+                id="loginId"
                 placeholder="4~20자의 영문, 숫자, 특수문자 '_'사용가능"
                 className={`w-full px-3 py-2.5 border ${
-                  errors.userId ? "border-red-500" : "border-gray-300"
+                  errors.loginId ? "border-red-500" : "border-gray-300"
                 } rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500`}
-                {...register("userId")}
+                {...register("loginId")}
               />
-              {errors.userId && <p className="text-red-500 text-xs mt-1">{errors.userId.message}</p>}
+              {errors.loginId && <p className="text-red-500 text-xs mt-1">{errors.loginId.message}</p>}
+              {loginIdMsg && (
+                <p className={`text-xs mt-1 ${loginIdMsg.includes("사용 가능") ? "text-green-500" : "text-red-500"}`}>
+                  {loginIdMsg}
+                </p>
+              )}
             </div>
-
-            {/* Password */}
+              {/* 비밀번호 */}
             <div>
               <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
                 비밀번호
               </label>
-              <input
-                type="password"
-                id="password"
-                placeholder="8~16자리/영문 대소문자, 숫자, 특수문자 조합"
-                className={`w-full px-3 py-2.5 border ${
-                  errors.password ? "border-red-500" : "border-gray-300"
-                } rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500`}
-                {...register("password")}
-              />
+              <div className="relative">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  id="password"
+                  placeholder="8~16자리/영문 대소문자, 숫자, 특수문자 조합"
+                  className={`w-full px-3 py-2.5 border ${
+                    errors.password ? "border-red-500" : "border-gray-300"
+                  } rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500`}
+                  {...register("password")}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                >
+                  {showPassword ? <EyeOff className="h-5 w-5 text-gray-400" /> : <Eye className="h-5 w-5 text-gray-400" />}
+                </button>
+              </div>
               {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password.message}</p>}
-              <p className="text-xs text-gray-500 mt-1">
-                8~16자리 영문 대소문자, 숫자, 특수문자 중 3가지 이상 조합으로 만들어주세요.
-              </p>
             </div>
 
-            {/* Email */}
+            {/* 비밀번호 확인 */}
+            <div>
+              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-1">
+                비밀번호 확인
+              </label>
+              <div className="relative">
+                <input
+                  type={showConfirmPassword ? "text" : "password"}
+                  id="confirmPassword"
+                  placeholder="비밀번호 재입력"
+                  className={`w-full px-3 py-2.5 border ${
+                    errors.confirmPassword ? "border-red-500" : "border-gray-300"
+                  } rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500`}
+                  {...register("confirmPassword")}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                >
+                  {showConfirmPassword ? <EyeOff className="h-5 w-5 text-gray-400" /> : <Eye className="h-5 w-5 text-gray-400" />}
+                </button>
+              </div>
+              {errors.confirmPassword && <p className="text-red-500 text-xs mt-1">{errors.confirmPassword.message}</p>}
+            </div>
+
+            {/* 이메일 */}
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
                 이메일
               </label>
-              <input
-                type="email"
-                id="email"
-                placeholder="email@saramin.co.kr"
-                className={`w-full px-3 py-2.5 border ${
-                  errors.email ? "border-red-500" : "border-gray-300"
-                } rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500`}
-                {...register("email")}
-              />
+              <div className="flex mb-2">
+                <input
+                  type="email"
+                  id="email"
+                  placeholder="이메일 입력"
+                  className={`flex-1 px-3 py-2.5 border ${
+                    errors.email ? "border-red-500" : "border-gray-300"
+                  } rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500`}
+                  {...register("email")}
+                />
+                <button
+                  type="button"
+                  onClick={handleEmailCertification}   // ⬅️ 바로 인증코드 발송
+                  className="ml-2 px-4 py-2.5 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700 transition-colors"
+                >
+                  이메일 인증
+                </button>
+              </div>
+
+              {/* 에러 메세지 출력 */}
               {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email.message}</p>}
+
+              {/* 인증코드 요청 후 입력칸 표시 */}
+              {emailCertificationRequested && (
+                <div className="mt-2 space-y-2">
+                  <div className="flex">
+                    <input
+                      type="text"
+                      placeholder="인증코드 입력"
+                      value={certificationCode}
+                      onChange={(e) => setCertificationCode(e.target.value)}
+                      className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
+                    />
+                    <button
+                      type="button"
+                      onClick={handleVerifyCertification}
+                      className="ml-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                    >
+                      확인
+                    </button>
+                  </div>
+                  <p className="text-xs text-gray-500">
+                    남은 시간: {Math.floor(timeLeft / 60)}:{(timeLeft % 60).toString().padStart(2, '0')}
+                  </p>
+                </div>
+              )}
+
+              {/* 인증 완료 시 표시 */}
+              {certificationVerified && (
+                <p className="text-green-500 text-xs mt-1">인증 완료되었습니다!</p>
+              )}
             </div>
 
-            {/* Website (Optional) */}
+
+            {/* 웹사이트 (선택) */}
             <div>
               <label htmlFor="website" className="block text-sm font-medium text-gray-700 mb-1">
-                회사 웹사이트 (선택)
+                웹사이트 <span className="text-gray-400 text-xs">(선택)</span>
               </label>
               <input
                 type="text"
                 id="website"
-                placeholder="http:// 또는 https:// 포함하여 입력"
+                placeholder="회사 웹사이트 주소"
                 className="w-full px-3 py-2.5 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
                 {...register("website")}
               />
             </div>
 
-            {/* Consent Section */}
-            <div>
-              <h3 className="text-sm font-medium text-gray-700 mb-3">약관</h3>
-              <div className="border rounded-md p-4">
-                <div className="space-y-3">
-                  <div className="flex items-center">
-                    <input
-                      type="checkbox"
-                      id="allConsent"
-                      checked={allConsent}
-                      onChange={handleAllConsentChange}
-                      className="h-4 w-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500"
-                    />
-                    <label htmlFor="allConsent" className="ml-2 text-sm font-medium">
-                      전체 동의
-                    </label>
-                  </div>
 
-                  <div className="border-t pt-3">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center">
-                        <input
-                          type="checkbox"
-                          id="serviceConsent"
-                          className="h-4 w-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500"
-                          {...register("serviceConsent")}
-                        />
-                        <label htmlFor="serviceConsent" className="ml-2 text-sm">
-                          (필수) 기업회원 약관에 동의
-                        </label>
-                      </div>
-                      <ChevronRight className="h-4 w-4 text-gray-400" />
-                    </div>
-                  </div>
-
-                  <div className="border-t pt-3">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center">
-                        <input
-                          type="checkbox"
-                          id="privacyConsent"
-                          className="h-4 w-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500"
-                          {...register("privacyConsent")}
-                        />
-                        <label htmlFor="privacyConsent" className="ml-2 text-sm">
-                          (필수) 개인정보 수집 및 이용에 동의
-                        </label>
-                      </div>
-                      <ChevronRight className="h-4 w-4 text-gray-400" />
-                    </div>
-                  </div>
-
-                  <div className="border-t pt-3">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center">
-                        <input
-                          type="checkbox"
-                          id="marketingEmailConsent"
-                          className="h-4 w-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500"
-                          {...register("marketingEmailConsent")}
-                        />
-                        <label htmlFor="marketingEmailConsent" className="ml-2 text-sm">
-                          (선택) 마케팅 정보 수신 동의 - 이메일
-                        </label>
-                      </div>
-                      <ChevronRight className="h-4 w-4 text-gray-400" />
-                    </div>
-                  </div>
-
-                  <div className="border-t pt-3">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center">
-                        <input
-                          type="checkbox"
-                          id="marketingSmsConsent"
-                          className="h-4 w-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500"
-                          {...register("marketingSmsConsent")}
-                        />
-                        <label htmlFor="marketingSmsConsent" className="ml-2 text-sm">
-                          (선택) 마케팅 정보 수신 동의 - SMS/MMS
-                        </label>
-                      </div>
-                      <ChevronRight className="h-4 w-4 text-gray-400" />
-                    </div>
-                  </div>
-                </div>
+            {/* 약관 동의 */}
+            <div className="space-y-3 border-t pt-6">
+              <label className="flex items-center">
+                <input
+                  type="checkbox"
+                  className="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                  checked={allConsent}
+                  onChange={handleAllConsentChange}
+                  {...register("allConsent")}
+                />
+                <span className="ml-2 text-sm font-medium">전체 동의</span>
+              </label>
+              
+              <div className="pl-6 space-y-2">
+                <label className="flex items-center">
+                  <input
+                    type="checkbox"
+                    className="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                    {...register("serviceConsent")}
+                  />
+                  <span className="ml-2 text-sm">
+                    [필수] 서비스 이용약관 동의 
+                    <button type="button" className="ml-1 text-blue-500 underline text-xs">보기</button>
+                  </span>
+                </label>
+                
+                <label className="flex items-center">
+                  <input
+                    type="checkbox"
+                    className="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                    {...register("privacyConsent")}
+                  />
+                  <span className="ml-2 text-sm">
+                    [필수] 개인정보 수집 및 이용 동의
+                    <button type="button" className="ml-1 text-blue-500 underline text-xs">보기</button>
+                  </span>
+                </label>
+                
+                <label className="flex items-center">
+                  <input
+                    type="checkbox"
+                    className="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                    {...register("marketingEmailConsent")}
+                  />
+                  <span className="ml-2 text-sm">
+                    [선택] 마케팅 목적 이메일 수신 동의
+                    <button type="button" className="ml-1 text-blue-500 underline text-xs">보기</button>
+                  </span>
+                </label>
+                
+                <label className="flex items-center">
+                  <input
+                    type="checkbox"
+                    className="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                    {...register("marketingSmsConsent")}
+                  />
+                  <span className="ml-2 text-sm">
+                    [선택] 마케팅 목적 SMS 수신 동의
+                    <button type="button" className="ml-1 text-blue-500 underline text-xs">보기</button>
+                  </span>
+                </label>
+                
+                <label className="flex items-center">
+                  <input
+                    type="checkbox"
+                    className="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                    {...register("thirdPartyConsent")}
+                  />
+                  <span className="ml-2 text-sm">
+                    [선택] 제3자 정보제공 동의
+                    <button type="button" className="ml-1 text-blue-500 underline text-xs">보기</button>
+                  </span>
+                </label>
               </div>
             </div>
 
-            {/* Submit Button */}
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className="w-full py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors flex items-center justify-center"
-            >
-              {isSubmitting ? (
-                <div className="h-5 w-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-              ) : (
-                "회원가입 완료"
-              )}
-            </button>
-          </form>
-        </div>
-      </div>
-    </div>
-  )
-}
+            {/* 제출 버튼 */}
+            <div>
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className="w-full bg-blue-600 text-white py-3 rounded-md hover:bg-blue-700 transition-colors flex items-center justify-center"
+              >
+                {isSubmitting ? (
+                  <div className="h-5 w-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                ) : (
+                  "회원가입"
+                )}
+              </button>
+            </div>            
+            </form>
+                    </div>
+                  </div>
+                </div>
+              );
+            };

@@ -6,6 +6,7 @@ import { PostFeed } from "./PostFeed"
 import { NewsSidebar } from "./NewsSidebar"
 import { HashtagFilterModal } from "./HashtagFilterModal"
 import { CreatePostModal } from "./CreatePostModal"
+import { PopularPosts } from "./PopularPosts"
 
 export const CommunityContent = () => {
   const [isFilterModalOpen, setIsFilterModalOpen] = useState(false)
@@ -49,8 +50,9 @@ export const CommunityContent = () => {
             onOpenCreatePostModal={handleOpenCreatePostModal}
           />
         </div>
-        <div className="w-full md:w-64">
+        <div className="w-full md:w-64 flex flex-col gap-6">
           <NewsSidebar selectedTags={selectedHashtags} />
+          <PopularPosts /> {/* 뉴스 사이드바 바로 아래에 인기글 컴포넌트 추가 */}
         </div>
       </div>
 
@@ -65,11 +67,10 @@ export const CommunityContent = () => {
       {isCreatePostModalOpen && (
         <CreatePostModal
           onClose={handleCloseCreatePostModal}
-          profileImageUrl="/profile.png" // 기본 프로필 이미지
+          profileImageUrl="/images/etc/profile.png" // 기본 프로필 이미지
           userName="User1"               // 기본 사용자 이름
         />
       )}
-
     </div>
   )
 }

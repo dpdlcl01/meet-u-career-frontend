@@ -1,68 +1,51 @@
 "use client"
 
-import { useState } from "react"
-import { ChevronDown } from "lucide-react"
+import { Calendar, Star } from "lucide-react"
 
-export const InterviewExperience = () => {
-  const [isExpanded, setIsExpanded] = useState(false)
-  const [expandedQuestion, setExpandedQuestion] = useState<number | null>(null)
+interface Review {
+  id: number
+  jobCategoryName: string
+  interviewYearMonth: string
+  rating: number
+  createdAt: string
+  questionsAsked: string
+  result: number
+}
 
-  const toggleQuestion = (index: number) => {
-    if (expandedQuestion === index) {
-      setExpandedQuestion(null)
-    } else {
-      setExpandedQuestion(index)
-    }
-  }
+interface Props {
+  reviews: Review[]
+}
 
+export const InterviewExperience = ({ reviews }: Props) => {
   return (
-    <div className="bg-white rounded-lg p-6 mb-6">
-      <h2 className="text-lg font-bold mb-4">인사담당자가 직접 답변했어요!</h2>
-      <p className="text-sm text-gray-600 mb-6">
-        2022-11-03 [현대자동차] 대리님 및 기타사원 관리/운영 업무에 종사하고 있습니다.
-      </p>
-
-      <div className="border rounded-lg p-4 mb-4">
-        <div className="flex items-center justify-between cursor-pointer" onClick={() => toggleQuestion(1)}>
-          <h3 className="text-sm font-medium">Q1. 근무 환경은 어떤가요?</h3>
-          <ChevronDown className={`w-4 h-4 transition-transform ${expandedQuestion === 1 ? "rotate-180" : ""}`} />
-        </div>
-
-        {expandedQuestion === 1 && (
-          <div className="mt-3 pt-3 border-t">
-            <div className="flex gap-4 text-sm">
-              <div className="flex items-center gap-1">
-                <span className="text-gray-600">내근</span>
-                <span className="text-blue-600 font-medium">100%</span>
-              </div>
-              <div className="flex items-center gap-1">
-                <span className="text-gray-600">거래 빈도</span>
-              </div>
+    <div className="space-y-4">
+      <h2 className="text-lg font-semibold">면접 후기</h2>
+      {reviews.map((review) => (
+        <div
+          key={review.id}
+          className="border rounded-lg p-4 bg-white hover:shadow transition-shadow"
+        >
+          <div className="flex justify-between items-center">
+            <div>
+              <p className="text-sm text-gray-500">{review.jobCategoryName}</p>
+              <p className="text-base font-semibold text-gray-800">
+                {review.interviewYearMonth} 면접 후기
+              </p>
+            </div>
+            <div className="flex items-center space-x-2 text-sm text-yellow-600">
+              <Star className="w-4 h-4 fill-yellow-400 stroke-yellow-500" />
+              <span>{review.rating} / 2</span>
             </div>
           </div>
-        )}
-      </div>
-
-      <div className="border rounded-lg p-4">
-        <div className="flex items-center justify-between cursor-pointer" onClick={() => toggleQuestion(2)}>
-          <h3 className="text-sm font-medium">Q2. 회사 및 제품은 어떤가요 하나요?</h3>
-          <ChevronDown className={`w-4 h-4 transition-transform ${expandedQuestion === 2 ? "rotate-180" : ""}`} />
-        </div>
-
-        {expandedQuestion === 2 && (
-          <div className="mt-3 pt-3 border-t">
-            <p className="text-sm text-gray-600">좋은 회사 제품</p>
+          <p className="text-sm mt-3 text-gray-700 whitespace-pre-wrap">
+            {review.questionsAsked}
+          </p>
+          <div className="text-xs text-gray-400 mt-2 flex items-center">
+            <Calendar className="w-4 h-4 mr-1" />
+            {new Date(review.createdAt).toLocaleDateString()}
           </div>
-        )}
-      </div>
-
-      <button
-        className="w-full mt-4 text-sm text-gray-500 flex items-center justify-center"
-        onClick={() => setIsExpanded(!isExpanded)}
-      >
-        {isExpanded ? "접기" : "펼쳐보기"}{" "}
-        <ChevronDown className={`ml-1 w-4 h-4 transition-transform ${isExpanded ? "rotate-180" : ""}`} />
-      </button>
+        </div>
+      ))}
     </div>
   )
 }

@@ -1,11 +1,9 @@
 export type TabType = '전체' | '검토중' | '수락함' | '거절함'
-
-type OffersTabsProps = {
+interface OffersTabsProps {
   activeTab: TabType
   onTabChange: (tab: TabType) => void
   counts: Record<TabType, number>
 }
-
 export function OffersTabs({ activeTab, onTabChange, counts }: OffersTabsProps) {
   const tabs: { id: TabType; label: string }[] = [
     { id: '전체', label: '전체' },
@@ -13,7 +11,6 @@ export function OffersTabs({ activeTab, onTabChange, counts }: OffersTabsProps) 
     { id: '수락함', label: '수락' },
     { id: '거절함', label: '거절' },
   ]
-
   return (
     <div className="border-b border-gray-200">
       <nav className="flex">

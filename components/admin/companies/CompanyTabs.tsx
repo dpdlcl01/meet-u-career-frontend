@@ -24,7 +24,7 @@ export default function CompanyTabs({ activeTab, onTabChange }: CompanyTabsProps
           <button
             key={tab.id}
             onClick={() => onTabChange(tab.id)}
-            className={`py-2 px-1 -mb-px font-medium text-sm ${
+            className={`py-2 px-1 -mb-px font-medium text-l ${
               activeTab === tab.id ? "border-b-2 border-blue-500 text-blue-600" : "text-gray-500 hover:text-gray-700"
             }`}
           >

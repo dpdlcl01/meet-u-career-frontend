@@ -17,7 +17,7 @@ export const PersonalLoginForm = () => {
   const [serverError, setServerError] = useState<string>("");
   const { setTokens } = useAuthStore();
 
-  // 로드 시 저장된 아이디 복구
+  // 저장된 아이디 복구
   useEffect(() => {
     const savedUserId = localStorage.getItem("savedUserId");
     if (savedUserId) {
@@ -61,7 +61,12 @@ export const PersonalLoginForm = () => {
         const { accessToken, refreshToken } = response.data.data || {};
 
         if (accessToken && refreshToken) {
+          // ✅ Zustand 스토어에 저장
           setTokens(accessToken, refreshToken);
+
+          // ✅ 그리고 sessionStorage에도 저장 (여기가 핵심!!)
+          sessionStorage.setItem("accessToken", accessToken);
+          sessionStorage.setItem("refreshToken", refreshToken);
 
           // 로그인 성공 후 아이디 저장
           if (rememberMe) {
@@ -70,6 +75,7 @@ export const PersonalLoginForm = () => {
             localStorage.removeItem("savedUserId");
           }
 
+          // 사용자 정보 가져오기
           await fetchMyInfo();
 
           // 메인 페이지로 이동
@@ -81,9 +87,7 @@ export const PersonalLoginForm = () => {
         setServerError(response.data.msg);
       }
     } catch (error: any) {
-      setServerError(
-        error.response?.data?.msg
-      );
+      setServerError(error.response?.data?.msg || "로그인 실패");
     }
   };
 

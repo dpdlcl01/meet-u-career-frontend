@@ -5,19 +5,13 @@ services:
       dockerfile: Dockerfile
     container_name: frontend
     command: npm run start
-    networks:
-      - meetu_net
-  nginx:
-    image: nginx:alpine
-    networks:
-      - meetu_net
-    restart: always
-    volumes:
-      - ./conf/default.conf:/etc/nginx/conf.d/default.conf:ro
+    environment:
+      - NEXT_DISABLE_FILE_WATCHER=true
     ports:
-      - "80:80"
-    depends_on:
-      - frontend
+      - "3000:3000"
+    networks:
+      - meetu_net
+
 networks:
   meetu_net:
     driver: bridge

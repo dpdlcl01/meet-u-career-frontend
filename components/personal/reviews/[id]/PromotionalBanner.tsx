@@ -1,11 +1,19 @@
+"use client"
+
 import Image from "next/image"
 
-export const PromotionalBanner = () => {
+interface Props {
+  reviewCount: number
+}
+
+export const PromotionalBanner = ({ reviewCount }: Props) => {
   return (
     <div className="bg-[#1EBEC4] rounded-lg p-6 mb-6 relative overflow-hidden">
       <div className="flex items-center">
         <div className="z-10">
-          <h3 className="text-white font-bold text-lg mb-1">현재 345,767개의 기업리뷰가 사람인에 등록됐어요!</h3>
+          <h3 className="text-white font-bold text-lg mb-1">
+            현재 {reviewCount.toLocaleString()}개의 기업리뷰가 등록됐어요!
+          </h3>
           <p className="text-white text-sm">
             당신의 회사 경험이 다른 구직자들에게 도움이 될 거예요. <span className="underline">지금 참여하기</span>
           </p>

@@ -1,14 +1,11 @@
-"use client"
-
+'use client'
 import axios from "axios"
 import { useState, useEffect, useMemo } from "react"
-import { useRouter, useSearchParams } from "next/navigation"
-import { OffersHeader } from "./OffersHeader"
-import { OffersStats } from "./OffersStats"
-import { OffersTabs, type TabType } from "./OffersTabs"
-import { OffersFilter } from "./OffersFilter"
-import { OfferCard } from "./OfferCard"
-
+import { OffersHeader } from "@/components/personal/mypage/offers/OffersHeader"
+import { OffersStats } from "@/components/personal/mypage/offers/OffersStats"
+import { OffersTabs, type TabType } from "@/components/personal/mypage/offers/OffersTabs"
+import { OffersFilter } from "@/components/personal/mypage/offers/OffersFilter"
+import { OffersList } from "@/components/personal/mypage/offers/OffersList"
 interface Offer {
   id: number
   company: string
@@ -18,68 +15,67 @@ interface Offer {
   description: string
   status: '검토중' | '수락함' | '거절함'
 }
-
-interface OffersContentProps {
-  offers: Offer[]
-  loading: boolean
-  error: string | null
-}
-
-export function OffersContent({ offers = [], loading, error }: OffersContentProps) {
-  const router = useRouter()
-  const searchParams = useSearchParams()
-  const rawTab = searchParams.get("tab")
-  const isValidTab = (val: string | null): val is TabType => {
-    return val === '전체' || val === '검토중' || val === '수락함' || val === '거절함'
-  }
-  const initialTab: TabType = isValidTab(rawTab) ? rawTab : '전체'
-
-  const [activeTab, setActiveTab] = useState<TabType>(initialTab)
-  const [localOffers, setLocalOffers] = useState<Offer[]>([])
-
-  useEffect(() => {
-    const fixed: Offer[] = offers.map((o) => ({
-      ...o,
-      status: o.status as '검토중' | '수락함' | '거절함',
-    }))
-    setLocalOffers(fixed)
-  }, [offers])
-
-  const counts = useMemo(() => {
-    return {
-      전체: localOffers.length,
-      검토중: localOffers.filter((o) => o.status === '검토중').length,
-      수락함: localOffers.filter((o) => o.status === '수락함').length,
-      거절함: localOffers.filter((o) => o.status === '거절함').length,
+export default function OffersContent() {
+  const [activeTab, setActiveTab] = useState<TabType>('전체')
+  const [offers, setOffers] = useState<Offer[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const accountId = 1
+  const mapStatus = (statusCode: number): '검토중' | '수락함' | '거절함' => {
+    switch (statusCode) {
+      case 1: return '수락함'
+      case 2: return '거절함'
+      default: return '검토중'
     }
-  }, [localOffers])
-
+  }
+  useEffect(() => {
+    axios
+      .get(`/api/personal/mypage/offers/list/all/${accountId}`)
+      .then((res) => {
+        const rawList = res.data?.data?.offerList ?? []
+        const mapped: Offer[] = rawList.map((o: any) => ({
+          id: o.id,
+          company: o.companyName,
+          position: '직무 미정',
+          location: o.location,
+          deadline: o.offerDate?.split('T')[0] ?? '날짜 미정',
+          description: o.message,
+          status: mapStatus(o.status)
+        }))
+        setOffers(mapped)
+      })
+      .catch((err) => {
+        console.error(err)
+        setError('오퍼 데이터를 불러올 수 없습니다.')
+      })
+      .finally(() => setLoading(false))
+  }, [])
+  const counts = useMemo(() => ({
+    전체: offers.length,
+    검토중: offers.filter((o) => o.status === '검토중').length,
+    수락함: offers.filter((o) => o.status === '수락함').length,
+    거절함: offers.filter((o) => o.status === '거절함').length,
+  }), [offers])
   const filtered = useMemo(() => {
     return activeTab === '전체'
-      ? localOffers
-      : localOffers.filter((o) => o.status === activeTab)
-  }, [localOffers, activeTab])
-
-  const updateOfferStatus = (id: number, nextTab: '수락함' | '거절함') => {
-    setLocalOffers((prev) => prev.map(o => o.id === id ? { ...o, status: nextTab } : o))
-    setActiveTab(nextTab)
-    const params = new URLSearchParams(window.location.search)
-    params.set("tab", nextTab)
-    router.replace(`?${params.toString()}`)
-  }
-
+      ? offers
+      : offers.filter((o) => o.status === activeTab)
+  }, [offers, activeTab])
   const handleTabChange = (tab: TabType) => {
     setActiveTab(tab)
-    const params = new URLSearchParams(window.location.search)
-    params.set("tab", tab)
-    router.replace(`?${params.toString()}`)
   }
-
+  const updateOfferStatus = (id: number, nextTab: '수락함' | '거절함') => {
+    // 1. 상태 업데이트
+    setOffers((prev) =>
+      prev.map((o) => (o.id === id ? { ...o, status: nextTab } : o))
+    )
+    // 2. 탭 전환
+    setActiveTab(nextTab)
+  }
   if (loading) return <p className="text-center p-4">로딩 중...</p>
   if (error) return <p className="text-red-500 text-center p-4">{error}</p>
-
   return (
-    <div className="space-y-6">
+    <div className="max-w-screen-xl mx-auto p-6">
       <OffersHeader />
       <OffersStats counts={counts} />
       <div className="bg-white rounded-lg shadow-sm p-6">
@@ -91,15 +87,11 @@ export function OffersContent({ offers = [], loading, error }: OffersContentProp
         <div className="mt-4 flex justify-end">
           <OffersFilter />
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-4">
-          {filtered.map((offer) => (
-            <OfferCard
-              key={offer.id}
-              offer={offer}
-              onActionComplete={(nextTab) => updateOfferStatus(offer.id, nextTab)}
-            />
-          ))}
-        </div>
+        <OffersList
+          key={`${activeTab}-${offers.map(o => o.status).join(',')}`} // 리렌더 보장
+          offers={filtered}
+          onActionComplete={updateOfferStatus}
+        />
       </div>
     </div>
   )
