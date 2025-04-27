@@ -1,7 +1,7 @@
 export interface JobProps {
     id: string;
     title: string;
-    companyName: string;
+    name: string;
     industry: string;
     jobType: string;
     salaryRange: string;

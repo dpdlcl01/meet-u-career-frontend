@@ -14,6 +14,7 @@ import { useEffect, useRef, useState, MouseEvent as ReactMouseEvent } from "reac
 import { NotificationDropdown } from "./NotificationDropdown"
 import { ChatDropdown } from "./ChatDropdown"
 import Image from "next/image"
+import { useNotificationStore } from "@/store/useNotificationStore"
 
 interface NavItem {
   label: string
@@ -27,6 +28,9 @@ export const BusinessHeader = () => {
   const [isOpen, setIsOpen] = useState<boolean>(false)
   const [isNotificationOpen, setIsNotificationOpen] = useState<boolean>(false)
   const [isChatOpen, setIsChatOpen] = useState<boolean>(false)
+
+  const { notifications, isLoaded } = useNotificationStore();
+  const hasUnreadNotification = isLoaded && notifications.some((n) => n.isRead === 0);
 
   const dropdownRef = useRef<HTMLDivElement>(null)
 
@@ -119,14 +123,13 @@ export const BusinessHeader = () => {
               aria-label="알림"
             >
               <Bell className="h-5 w-5 text-white/80" />
-              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center">
-                1
-              </span>
+              {hasUnreadNotification && (
+                <span className="absolute -top-0.5 -right-0.5 block h-2 w-2 rounded-full bg-red-500" />
+              )}
             </button>
             <NotificationDropdown
               isOpen={isNotificationOpen}
               onClose={() => setIsNotificationOpen(false)}
-              notificationCount={1}
             />
           </div>
 

@@ -57,9 +57,9 @@ export const ApplicationsTable = ({ data }) => {
                         if (!window.confirm("정말로 이 지원을 취소하시겠습니까?")) return;
                         try {
                           // profileId는 테스트용으로 2로 하드코딩
-                          await import("axios").then(({default: axios}) =>
+                          await import("axios").then(({ default: axios }) =>
                             axios.put(
-                              `http://localhost:8080/api/personal/mypage/applications/delete/${app.id}?profileId=2`,
+                              `/api/personal/mypage/applications/delete/${app.id}?profileId=2`,
                               {},
                               { withCredentials: true }
                             )

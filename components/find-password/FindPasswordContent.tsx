@@ -25,7 +25,7 @@ export const FindPasswordContent = () => {
     setIsLoading(true);
     setError("");
     try {
-      const response = await fetch("http://localhost:8080/api/password/find", {
+      const response = await fetch("/api/password/find", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: emailInput, userId: userIdInput, name: nameInput })
@@ -58,7 +58,7 @@ export const FindPasswordContent = () => {
     setIsLoading(true);
     setError("");
     try {
-      const response = await fetch("http://localhost:8080/api/password/verify", {
+      const response = await fetch("/api/password/verify", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ verificationToken, code: codeInput })
@@ -82,7 +82,7 @@ export const FindPasswordContent = () => {
     setIsLoading(true);
     setError("");
     try {
-      const response = await fetch("http://localhost:8080/api/password/reset", {
+      const response = await fetch("/api/password/reset", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ verificationToken, code, newPassword })
@@ -118,26 +118,26 @@ export const FindPasswordContent = () => {
           <FindPasswordSteps currentStep={currentStep} />
 
           {currentStep === "form" && (
-  <FindPasswordForm onSubmit={handleFormSubmit} isLoading={isLoading} error={error} />
-)}
+            <FindPasswordForm onSubmit={handleFormSubmit} isLoading={isLoading} error={error} />
+          )}
 
           {currentStep === "verification" && (
-  <FindPasswordVerification
-    email={email}
-    onSubmit={handleVerificationSubmit}
-    onBack={() => setCurrentStep("form")}
-  />
-)}
-{currentStep === "reset" && (
-  <FindPasswordReset
-    userId={userId}
-    code={code}
-    onSubmit={handlePasswordReset}
-    onBack={() => setCurrentStep("verification")}
-    isLoading={isLoading}
-    error={error}
-  />
-)}
+            <FindPasswordVerification
+              email={email}
+              onSubmit={handleVerificationSubmit}
+              onBack={() => setCurrentStep("form")}
+            />
+          )}
+          {currentStep === "reset" && (
+            <FindPasswordReset
+              userId={userId}
+              code={code}
+              onSubmit={handlePasswordReset}
+              onBack={() => setCurrentStep("verification")}
+              isLoading={isLoading}
+              error={error}
+            />
+          )}
         </div>
       </main>
     </div>

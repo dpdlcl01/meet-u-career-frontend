@@ -21,10 +21,10 @@ export const CompanyReviewList = ({ searchKeyword }: Props) => {
       setLoading(true)
       try {
         const url = searchKeyword
-          ? `http://localhost:8080/api/personal/interview-reviews/companies/search?keyword=${encodeURIComponent(
-              searchKeyword,
-            )}`
-          : `http://localhost:8080/api/personal/interview-reviews/companies`
+          ? `/api/personal/interview-reviews/companies/search?keyword=${encodeURIComponent(
+            searchKeyword,
+          )}`
+          : `/api/personal/interview-reviews/companies`
         const res = await fetch(url)
         const json = await res.json()
         setCompanies(json.data)
@@ -44,10 +44,10 @@ export const CompanyReviewList = ({ searchKeyword }: Props) => {
           {searchKeyword ? `"${searchKeyword}" 검색 결과` : "전체 기업리뷰"}
         </h2>
         {loading ? (
-            <p className="text-gray-500 text-sm">불러오는 중...</p>
-          ) : !companies || companies.length === 0 ? (
-            <p className="text-gray-500 text-sm">검색 결과가 없습니다.</p>
-          ) : (
+          <p className="text-gray-500 text-sm">불러오는 중...</p>
+        ) : !companies || companies.length === 0 ? (
+          <p className="text-gray-500 text-sm">검색 결과가 없습니다.</p>
+        ) : (
           <div className="space-y-4">
             {companies.map((company) => (
               <div key={company.companyId} className="border rounded-lg p-4 hover:shadow-md transition-shadow">

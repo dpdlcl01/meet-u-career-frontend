@@ -141,7 +141,7 @@ export default function AdminModal({ isOpen, onClose, onSave, initialData, mode 
               required
             />
           </div>
-          <div className="grid grid-cols-2 gap-4 mb-4">                      
+          <div className="grid grid-cols-2 gap-4 mb-4">
           </div>
           <div className="mb-4">
             <label htmlFor="level" className="block text-sm font-medium text-gray-700 mb-1">

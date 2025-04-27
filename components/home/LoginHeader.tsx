@@ -10,15 +10,16 @@ import ProfileDropdown from "./ProfileDropdown";
 import { useUserStore } from "@/store/useUserStore";
 import { useNotificationStore } from "@/store/useNotificationStore";
 import { useRouter } from "next/navigation";
+import { useSearchStore } from "@/hooks/useSearchStore";
 
 export const LoginHeader = () => {
   const router = useRouter();
   const [notificationOpen, setNotificationOpen] = useState(false);
   const [chatOpen, setChatOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
-  const [searchKeyword, setSearchKeyword] = useState<string>("");
 
-  const { userInfo } = useUserStore();
+  const { userInfo } = useUserStore(); // 내 정보
+
   const { notifications, isLoaded } = useNotificationStore();
   const hasUnreadNotification = isLoaded && notifications.some((n) => n.isRead === 0);
 
@@ -26,12 +27,17 @@ export const LoginHeader = () => {
   const chatRef = useRef<HTMLDivElement>(null);
   const profileRef = useRef<HTMLDivElement>(null);
 
+  const [search, setSearch] = useState<string>("");  // 헤더에서 관리되는 검색어
+  const { setStoreKeyword } = useSearchStore();  // zustand에서의 keyword 상태 설정 함수
+
   // 검색어 입력
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
       e.preventDefault();
-      if (searchKeyword.trim() !== "") {
-        router.push(`/personal/jobs?keyword=${encodeURIComponent(searchKeyword.trim())}`);
+      if (search.trim() !== "") {
+        // 상태에 검색어 반영 후, 검색 페이지로 이동
+        setStoreKeyword(search);
+        router.push(`/personal/jobs`);
       }
     }
   };
@@ -92,8 +98,8 @@ export const LoginHeader = () => {
             <Search className="absolute left-4 w-5 h-5 text-blue-500" />
             <input
               type="text"
-              value={searchKeyword}
-              onChange={(e) => setSearchKeyword(e.target.value)}
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
               onKeyDown={handleKeyDown}
               className="pl-12 pr-4 py-2 w-full text-sm font-semibold border border-blue-500 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500"
             />

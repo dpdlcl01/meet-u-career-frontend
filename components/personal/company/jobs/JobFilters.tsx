@@ -1,3 +1,4 @@
+
 export const JobFilters = () => {
   const filters = [
     { id: "all", label: "전체" },
@@ -23,11 +24,10 @@ export const JobFilters = () => {
         {filters.map((filter) => (
           <button
             key={filter.id}
-            className={`px-3 py-1.5 text-xs rounded-full border ${
-              filter.id === "all"
+            className={`px-3 py-1.5 text-xs rounded-full border ${filter.id === "all"
                 ? "bg-blue-50 text-blue-600 border-blue-200"
                 : "bg-white text-gray-700 border-gray-300 hover:bg-gray-50"
-            }`}
+              }`}
           >
             {filter.label}
           </button>

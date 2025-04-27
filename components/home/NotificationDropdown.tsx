@@ -1,10 +1,11 @@
 "use client";
 
-import { useNotificationStore } from "@/store/useNotificationStore";
+
+import { useEffect } from "react";
 import { formatDistanceToNow } from "date-fns";
 import { ko } from "date-fns/locale";
 import { apiClient } from "@/api/apiClient";
-import { useEffect } from "react";
+import { useNotificationStore } from "@/store/useNotificationStore";
 
 export default function NotificationDropdown() {
   const {

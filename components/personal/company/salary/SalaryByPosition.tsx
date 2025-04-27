@@ -1,3 +1,4 @@
+
 export const SalaryByPosition = () => {
   const positionData = [
     { position: "사원", minSalary: 4200, maxSalary: 5800, avgSalary: 5100 },

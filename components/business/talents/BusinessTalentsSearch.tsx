@@ -75,7 +75,7 @@ export const BusinessTalentsSearch = () => {
   // Fetch talents from backend
   const [talents, setTalents] = useState<TalentModel[]>([])
   useEffect(() => {
-    axios.get<ApiResult<TalentDto[]>>("http://localhost:8080/business/talents")
+    axios.get<ApiResult<TalentDto[]>>("/business/talents")
       .then(response => {
         const dtos = response.data.data
         const enriched = dtos.map(d => ({

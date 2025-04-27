@@ -16,7 +16,7 @@ export const fetchMyInfo = async () => {
     const response = await apiClient.get<any>("/api/user/me", {
       withCredentials: !isLocalhost,
       headers: {
-        Authorization: accessToken ? `Bearer ${accessToken}` : "",
+        Authorization: `Bearer ${accessToken}`,
       },
     });
 

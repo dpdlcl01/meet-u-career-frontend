@@ -9,22 +9,22 @@ export const JobStatistics = ({ data }: Props) => {
   const stats = [
     {
       title: "전체 공고",
-      count: data.totalJobPostings,
+      count: data?.totalJobPostings ?? 0,
       icon: <FileText className="h-5 w-5 text-gray-600" />,
     },
     {
       title: "진행중 공고",
-      count: data.activeJobPostings,
+      count: data?.activeJobPostings ?? 0,
       icon: <FileText className="h-5 w-5 text-blue-500" />,
     },
     {
       title: "마감임박 공고",
-      count: data.nearingDeadlineJobPostings,
+      count: data?.nearingDeadlineJobPostings ?? 0,
       icon: <AlertCircle className="h-5 w-5 text-red-500" />,
     },
     {
       title: "마감된 공고",
-      count: data.closedJobPostings,
+      count: data?.closedJobPostings ?? 0,
       icon: <CheckCircle className="h-5 w-5 text-gray-600" />,
     },
   ];

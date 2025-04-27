@@ -9,7 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@hookform/resolvers": "^2.9.11",
+    "@hookform/resolvers": "latest",
     "@radix-ui/react-accordion": "^1.2.2",
     "@radix-ui/react-alert-dialog": "^1.1.4",
     "@radix-ui/react-aspect-ratio": "^1.1.1",
@@ -58,19 +58,17 @@
     "react-beautiful-dnd": "latest",
     "react-day-picker": "8.10.1",
     "react-dom": "^18.2.0",
-    "react-hook-form": "^7.56.1",
+    "react-hook-form": "latest",
     "react-resizable-panels": "^2.1.7",
-    "react-syntax-highlighter": "^15.6.1",
     "react-tooltip": "^5.28.1",
     "recharts": "latest",
     "sockjs-client": "^1.6.1",
     "sonner": "^1.7.1",
-    "sweetalert2": "^11.19.1",
     "tailwind-merge": "^2.5.5",
     "tailwindcss-animate": "^1.0.7",
     "ttf2woff2": "^6.0.1",
     "vaul": "^0.9.6",
-    "zod": "^3.24.3",
+    "zod": "latest",
     "zustand": "^5.0.3"
   },
   "devDependencies": {

@@ -8,6 +8,12 @@ interface Props {
 }
 
 export const CompanyProfile = ({ data }: Props) => {
+  const companyName = data.companyName || "회사명 미제공";
+  const industry = data.industry || "산업 미제공";
+  const address = data.address || "주소 미제공";
+  const employeeScale = data.employeeScale || "직원 수 미제공";
+  const foundedDate = data.foundedDate || "설립일 미제공";
+
   return (
     <div className="bg-white rounded-md shadow-sm p-6 mb-6">
       <div className="flex items-start justify-between">
@@ -22,25 +28,25 @@ export const CompanyProfile = ({ data }: Props) => {
             />
           </div>
           <div>
-            <h1 className="text-lg font-medium">{data.companyName}</h1>
+            <h1 className="text-lg font-medium">{companyName}</h1>
             <div className="flex items-center mt-2 text-sm text-gray-600">
               <div className="flex items-center mr-4">
                 <Building className="h-4 w-4 mr-1 text-blue-500" />
-                <span>{data.industry}</span>
+                <span>{industry}</span>
               </div>
               <div className="flex items-center">
                 <MapPin className="h-4 w-4 mr-1 text-blue-500" />
-                <span>{data.address}</span>
+                <span>{address}</span>
               </div>
             </div>
             <div className="flex items-center mt-1 text-sm text-gray-600">
               <div className="flex items-center mr-4">
                 <Users className="h-4 w-4 mr-1 text-blue-500" />
-                <span>{data.employeeScale}</span>
+                <span>{employeeScale}</span>
               </div>
               <div className="flex items-center">
                 <span className="text-blue-500 mr-1">•</span>
-                <span>{data.foundedDate}</span>
+                <span>{foundedDate}</span>
               </div>
             </div>
           </div>

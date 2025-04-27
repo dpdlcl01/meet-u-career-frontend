@@ -1,9 +1,9 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
-import { Search } from "lucide-react";
 import { JobsFilter } from "./JobsFilter";
 import { JobCard } from "./JobCard";
+import { useSearchStore } from "@/hooks/useSearchStore";
 
 type JobDTO = {
   id: number;
@@ -33,17 +33,28 @@ export const JobsList = () => {
   const [loading, setLoading] = useState(false);
   const observer = useRef<IntersectionObserver | null>(null);
 
+  const { keyword: storeKeyword } = useSearchStore();
+
   const fetchJobs = async (isNew = false) => {
     setLoading(true);
     const params = new URLSearchParams();
+
+    // 필터 값들을 URL 파라미터로 추가
     if (filters.industry) params.append("industry", filters.industry);
     if (filters.experienceLevel !== undefined) params.append("experienceLevel", filters.experienceLevel.toString());
     if (filters.educationLevel !== undefined) params.append("educationLevel", filters.educationLevel.toString());
-    if (filters.keyword) params.append("keyword", filters.keyword);
+
+    // keyword 값 설정 (storeKeyword 우선)
+    const finalKeyword = storeKeyword || filters.keyword;
+    if (finalKeyword) {
+      params.append("keyword", finalKeyword);
+    }
+
     if (filters.locationCode) {
       const codes = filters.locationCode.split(",");
       codes.forEach(code => params.append("locationCode", code));
     }
+
     params.append("sort", sort);
     params.append("page", isNew ? "0" : page.toString());
     params.append("size", "20");
@@ -80,6 +91,7 @@ export const JobsList = () => {
     });
     if (node) observer.current.observe(node);
   }, [loading, hasMore]);
+
   return (
     <div className="mb-8">
       <div className="flex justify-between items-center mb-4">
@@ -92,9 +104,8 @@ export const JobsList = () => {
       </div>
 
       {/* 필터 */}
-      <JobsFilter onApply={setFilters}></JobsFilter> 
+      <JobsFilter onApply={setFilters}></JobsFilter>
 
-    
       {/* 카드 리스트 */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
         {jobs.map((job, index) => {

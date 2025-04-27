@@ -14,7 +14,7 @@ export const ApplicationsContent = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   // activeTab은 상태코드(null, 0, 1, 2)
-  const [activeTab, setActiveTab] = useState<null|number>(null);
+  const [activeTab, setActiveTab] = useState<null | number>(null);
   // 검색어 상태
   const [search, setSearch] = useState('');
   // 기간 필터 상태
@@ -29,8 +29,8 @@ export const ApplicationsContent = () => {
     // 테스트 profileId 수정필수!!
     //
     */
-    const profileId = 2; 
-    axios.get(`http://localhost:8080/api/personal/mypage/applications?profileId=${profileId}`, { withCredentials: true })
+    const profileId = 2;
+    axios.get(`/api/personal/mypage/applications?profileId=${profileId}`, { withCredentials: true })
       .then(res => {
         // If backend wraps in ResultData, use res.data.data
         const list = Array.isArray(res.data) ? res.data : res.data.data;
@@ -85,9 +85,9 @@ export const ApplicationsContent = () => {
   const searchFiltered = search.trim() === ''
     ? applications
     : applications.filter(app =>
-        app.company.toLowerCase().includes(search.trim().toLowerCase()) ||
-        app.position.toLowerCase().includes(search.trim().toLowerCase())
-      );
+      app.company.toLowerCase().includes(search.trim().toLowerCase()) ||
+      app.position.toLowerCase().includes(search.trim().toLowerCase())
+    );
 
   // 2차: 기간 필터
   const dateFiltered = searchFiltered.filter(isWithinDuration);

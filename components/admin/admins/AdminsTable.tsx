@@ -1,3 +1,4 @@
+
 "use client"
 
 import type { AdminData } from "@/types/admin/AdminData"
@@ -31,11 +32,10 @@ export default function AdminsTable({ admins, onEdit, onDelete }: AdminsTablePro
               </td>
               <td className="px-4 py-4">
                 <span
-                  className={`px-2 py-1 rounded-full text-xs font-medium ${
-                    admin.role === 1
+                  className={`px-2 py-1 rounded-full text-xs font-medium ${admin.role === 1
                       ? "bg-red-100 text-red-800"
                       : "bg-blue-100 text-blue-800"
-                  }`}
+                    }`}
                 >
                   {admin.role === 1 ? "슈퍼 관리자" : admin.role === 2 ? "일반 관리자" : "알 수 없음"}
                 </span>

@@ -1,7 +1,7 @@
 "use client";
 
 import type React from "react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import axios from "axios";
 import { fetchMyInfo } from "@/api/fetchMyInfo";
@@ -21,6 +21,15 @@ export const BusinessLoginForm = () => {
   }>({});
   const [successMessage, setSuccessMessage] = useState("");
   const { setTokens } = useAuthStore();
+
+  // 저장된 아이디 복구
+  useEffect(() => {
+    const savedUserId = localStorage.getItem("savedBusinessId");
+    if (savedUserId) {
+      setUserId(savedUserId);
+      setRememberMe(true);
+    }
+  }, []);
 
   const handleRememberMeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setRememberMe(e.target.checked);
@@ -46,9 +55,9 @@ export const BusinessLoginForm = () => {
 
           // 로그인 성공 후 아이디 저장
           if (rememberMe) {
-            localStorage.setItem("savedUserId", userId);
+            localStorage.setItem("savedBusinessId", userId);
           } else {
-            localStorage.removeItem("savedUserId");
+            localStorage.removeItem("savedBusinessId");
           }
 
           await fetchMyInfo();

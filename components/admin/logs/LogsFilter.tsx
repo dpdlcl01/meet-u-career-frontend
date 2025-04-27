@@ -1,4 +1,4 @@
-import { Calendar, Search, ChevronDown } from "lucide-react"
+import { Calendar, ChevronDown } from "lucide-react"
 
 export interface Filter {
   startDate: string

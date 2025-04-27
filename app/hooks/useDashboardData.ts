@@ -32,7 +32,7 @@ export const useDashboardData = (companyId: number) => {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    fetch(`http://localhost:8080/api/business/dashboard/${companyId}`, {
+    fetch(`/api/business/dashboard/${companyId}`, {
       credentials: "include",
     })
       .then((res) => res.json())

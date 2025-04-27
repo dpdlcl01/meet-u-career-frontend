@@ -22,18 +22,18 @@ export const PopularJobs = ({
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
         {isLoading
           ? Array.from({ length: 8 }).map((_, index) => (
-              <SkeletonJobCard key={index} />
-            ))
+            <SkeletonJobCard key={index} />
+          ))
           : popular.map((job, index) => (
-              <JobCard
-                key={job.id}
-                index={job.id}
-                title={job.title}
-                company={job.companyName}
-                dDay={calculateDday(job.expirationDate)}
-                hasImage={true}
-              />
-            ))}
+            <JobCard
+              key={job.id}
+              index={job.id}
+              title={job.title}
+              company={job.name}
+              dDay={calculateDday(job.expirationDate)}
+              hasImage={true}
+            />
+          ))}
       </div>
     </section>
   );

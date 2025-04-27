@@ -16,7 +16,7 @@ export default function FindIdContent() {
     setError(null);
     setFoundId(null);
     try {
-      const response = await fetch("http://localhost:8080/api/find-id", {
+      const response = await fetch("/api/find-id", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

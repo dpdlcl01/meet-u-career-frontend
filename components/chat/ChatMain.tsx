@@ -29,8 +29,8 @@ export function ChatMain({ chatId }: ChatMainProps) {
     // 메시지 데이터 객체 생성 (isRead를 0으로 설정)
     const messageData = {
       roomId: chatId,
-      senderId: userInfo.account.id,  // userInfo에서 accountId 사용
-      senderName: userInfo.account.name,  // userInfo에서 name 사용
+      senderId: userInfo.accountId,  // userInfo에서 accountId 사용
+      senderName: userInfo.name,  // userInfo에서 name 사용
       senderType: 0,  // accountType 사용 (0: 개인, 1: 기업)
       message: newMessage,  // 전송할 메시지
       type: "TALK",  // 메시지 타입
@@ -57,8 +57,8 @@ export function ChatMain({ chatId }: ChatMainProps) {
       <div className="p-4 border-b border-gray-200 flex items-center justify-between">
         <div className="flex items-center">
           <Image
-            src={selectedChat.avatar || "/images/etc/placeholder.svg"}
-            alt={selectedChat.name}
+            src={userInfo.profileImage || "/images/etc/placeholder.svg"}
+            alt="프로필"
             width={48}
             height={48}
             className="rounded-full"
@@ -75,13 +75,13 @@ export function ChatMain({ chatId }: ChatMainProps) {
         {messages.map((message, index) => (
           <div
             key={index}
-            className={`mb-4 flex ${message.senderId === userInfo.account.id ? "justify-end" : "justify-start"}`}
+            className={`mb-4 flex ${message.senderId === userInfo.accountId ? "justify-end" : "justify-start"}`}
           >
-            {message.senderId !== userInfo.account.id && (
+            {message.senderId !== userInfo.accountId && (
               <div className="flex-shrink-0 mr-3">
                 <Image
-                  src={selectedChat.avatar || "/images/etc/placeholder.svg"}
-                  alt={selectedChat.name}
+                  src={userInfo.profileImage || "/images/etc/placeholder.svg"}
+                  alt="프로필"
                   width={40}
                   height={40}
                   className="rounded-full"
@@ -89,15 +89,14 @@ export function ChatMain({ chatId }: ChatMainProps) {
               </div>
             )}
             <div
-              className={`max-w-[70%] rounded-lg p-3 ${
-                message.senderId === userInfo.account.id
-                  ? "bg-blue-500 text-white"
-                  : "bg-white border border-gray-200"
-              }`}
+              className={`max-w-[70%] rounded-lg p-3 ${message.senderId === userInfo.accountId
+                ? "bg-blue-500 text-white"
+                : "bg-white border border-gray-200"
+                }`}
             >
               <p className="text-sm">{message.message}</p>
               {/* 읽음 여부 표시 */}
-              {message.senderId === userInfo.account.id && (
+              {message.senderId === userInfo.accountId && (
                 <p className="text-xs mt-1 text-right">
                   {message.isRead === 1 ? "읽음" : "전송됨"}
                 </p>

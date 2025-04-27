@@ -4,18 +4,22 @@ import Link from "next/link"
 import { Search } from "lucide-react"
 import { usePathname, useRouter } from "next/navigation"
 import Image from "next/image"
+import { useSearchStore } from "@/hooks/useSearchStore"
 import { useState } from "react"
 
 export const Header = () => {
   const pathname = usePathname();
   const router = useRouter();
-  const [searchKeyword, setSearchKeyword] = useState<string>("");
+  const [search, setSearch] = useState<string>("");  // 헤더에서 관리되는 검색어
+  const { setStoreKeyword } = useSearchStore();  // zustand에서의 keyword 상태 설정 함수
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
       e.preventDefault();
-      if (searchKeyword.trim() !== "") {
-        router.push(`/personal/jobs?keyword=${encodeURIComponent(searchKeyword.trim())}`);
+      if (search.trim() !== "") {
+        // 상태에 검색어 반영 후, 검색 페이지로 이동
+        setStoreKeyword(search);
+        router.push(`/personal/jobs`);
       }
     }
   };
@@ -37,8 +41,8 @@ export const Header = () => {
             <Search className="absolute left-4 w-5 h-5 text-blue-500" />
             <input
               type="text"
-              value={searchKeyword}
-              onChange={(e) => setSearchKeyword(e.target.value)}
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
               onKeyDown={handleKeyDown}
               className="pl-12 pr-4 py-2 w-full text-sm font-semibold border border-blue-500 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500"
             />

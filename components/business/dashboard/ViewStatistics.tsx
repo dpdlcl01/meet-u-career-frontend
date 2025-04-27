@@ -14,14 +14,14 @@ export const ViewStatistics = ({ data }: Props) => {
           <Eye className="h-8 w-8 mx-auto text-blue-500" />
           <p className="mt-2 text-sm text-gray-600">전체 조회수</p>
           <p className="text-2xl font-bold mt-1">
-            {(data.totalViews ?? 0).toLocaleString()}명
+            {(data?.totalViews ?? 0).toLocaleString()}명
           </p>
         </div>
         <div>
           <Users className="h-8 w-8 mx-auto text-green-500" />
           <p className="mt-2 text-sm text-gray-600">전체 지원자수</p>
           <p className="text-2xl font-bold mt-1">
-            {(data.totalApplications ?? 0).toLocaleString()}명
+            {(data?.totalApplications ?? 0).toLocaleString()}명
           </p>
         </div>
       </div>

@@ -1,19 +1,20 @@
 "use client";
 
-import { Suspense } from "react"
-import { useAuthGuard } from "@/hooks/useAuthGuard"
-import { ChatLayout } from "@/components/chat/ChatLayout"
-import { ChatSkeleton } from "@/components/chat/ChatSkeleton"
+import { useAuthGuard } from "@/hooks/useAuthGuard";
+import AdminHeader from "@/components/admin/layout/AdminHeader";
+import AdminsManagement from "@/components/admin/admins/AdminsManagement";
 
-export default function ChatPage() {
-  const isChecking = useAuthGuard("any") // 로그인만 되어 있으면 통과
+export default function AdminsPage() {
+  const isChecking = useAuthGuard("admin"); // admin만 접근 가능
 
-  if (isChecking) return null  // 로딩 중에는 아무것도 렌더링하지 않음
+  if (isChecking) return null; // 검사 중일 땐 아무것도 렌더링하지 않음
 
   return (
-    <Suspense fallback={<ChatSkeleton />}>
-      <ChatLayout />
-    </Suspense>
-  )
+    <div className="min-h-screen bg-gray-50">
+      <AdminHeader />
+      <main className="container mx-auto px-4 py-8">
+        <AdminsManagement />
+      </main>
+    </div>
+  );
 }
-

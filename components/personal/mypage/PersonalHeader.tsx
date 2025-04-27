@@ -62,7 +62,7 @@ export function PersonalHeader() {
           >
             <Menu className="h-5 w-5" />
           </Button>
-          <Link href="/personal/mypage" className="flex items-center">
+          <Link href="/" className="flex items-center">
             <span className="text-lg font-bold text-blue-600">meet</span>
             <span className="text-lg font-bold text-blue-600">Ü</span>
           </Link>

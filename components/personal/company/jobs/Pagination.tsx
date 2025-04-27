@@ -10,9 +10,8 @@ export const Pagination = ({ currentPage = 1, totalPages = 1 }: PaginationProps)
       pageNumbers.push(
         <button
           key={i}
-          className={`w-8 h-8 flex items-center justify-center rounded-md text-sm ${
-            i === currentPage ? "bg-blue-500 text-white" : "text-gray-700 hover:bg-gray-100"
-          }`}
+          className={`w-8 h-8 flex items-center justify-center rounded-md text-sm ${i === currentPage ? "bg-blue-500 text-white" : "text-gray-700 hover:bg-gray-100"
+            }`}
         >
           {i}
         </button>,
