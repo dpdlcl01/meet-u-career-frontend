@@ -211,8 +211,8 @@ export const CreatePostModal = ({
         <div className="p-4 flex flex-col gap-2">
           {/* 기존 업로드된 이미지 표시 */}
           {previewImage && !selectedImage && (
-            <div className="flex items-center text-xs text-gray-600 p-2 bg-gray-50 rounded-md justify-between">
-              <span>현재 이미지: {extractFileName(previewImage)}</span>
+            <div className="flex items-center text-xs text-gray-600 p-2 bg-gray-50 rounded-md justify-between overflow-x-auto max-w-full">
+              <span className="truncate">현재 이미지: {extractFileName(previewImage)}</span>
               <button onClick={() => {
                 setPreviewImage(null);
                 setImageKey(null); // 이미지 삭제 시 키도 함께 삭제

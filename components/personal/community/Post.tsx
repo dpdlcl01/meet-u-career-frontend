@@ -362,6 +362,19 @@ export const Post = ({ post }: PostProps) => {
       alert("댓글 수정에 실패했습니다.");
     }
   };
+
+  // 공유 버튼 클릭 핸들러
+  const handleShare = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    try {
+      const shareUrl = `${window.location.origin}/personal/community/${post.id}`;
+      await navigator.clipboard.writeText(shareUrl);
+      alert("링크가 복사되었습니다!");
+    } catch (error) {
+      console.error("링크 복사 실패", error);
+      alert("링크 복사에 실패했습니다.");
+    }
+  };
   
 
   //----------------------------------------
@@ -455,7 +468,8 @@ export const Post = ({ post }: PostProps) => {
         </button>
 
         {/* 공유 버튼 */}
-        <button className="ml-auto text-gray-500 hover:text-gray-700">
+        <button className="ml-auto text-gray-500 hover:text-gray-700"
+          onClick={handleShare}>
           <Share2 className="h-5 w-5" />
         </button>
       </div>

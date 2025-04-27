@@ -3,13 +3,14 @@
 import { apiClient } from "@/api/apiClient";
 import { useAuthStore } from "@/store/useAuthStore";
 import { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { Post } from "@/components/personal/community/Post";
 
 export default function PostDetailPage() {
   const params = useParams();
   const postId = params?.postId as string;
 
+  const router = useRouter();
   const [postData, setPostData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -17,6 +18,14 @@ export default function PostDetailPage() {
   useEffect(() => {
     const fetchPost = async () => {
       try {
+        const token = useAuthStore.getState().accessToken;
+
+        if (!token) {
+          alert("로그인이 필요합니다.");
+          router.push("/login"); // 토큰 없으면 로그인 페이지로 이동
+          return;
+        }
+
         const isLocalhost = typeof window !== "undefined" && window.location.hostname === "localhost";
         const response = await apiClient.get(`/api/personal/community/posts/detail/${postId}`, {
           withCredentials: !isLocalhost,
