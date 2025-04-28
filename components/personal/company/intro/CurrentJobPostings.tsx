@@ -19,7 +19,7 @@ export const CurrentJobPostings = () => {
             <span className="text-xs text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full">경력무관</span>
             <span className="text-xs text-gray-500 ml-2">서울 • 대규모</span>
           </div>
-          <h3 className="font-medium mb-2">[현대자동차] 경력채용 테스트 스크립트 및 개발자 채용</h3>
+          <h3 className="font-medium mb-2">[더존비즈온] 경력채용 테스트 스크립트 및 개발자 채용</h3>
           <div className="flex text-xs text-gray-500 mb-2">
             <span>개발직군</span>
             <span className="mx-1">•</span>
@@ -38,7 +38,7 @@ export const CurrentJobPostings = () => {
             <span className="text-xs text-green-600 bg-green-50 px-2 py-0.5 rounded-full">신입</span>
             <span className="text-xs text-gray-500 ml-2">서울 • 대규모</span>
           </div>
-          <h3 className="font-medium mb-2">3월 현대자동차(글로벌 서비스 수석전문 연구원)</h3>
+          <h3 className="font-medium mb-2">3월 더존비즈온(글로벌 서비스 수석전문 연구원)</h3>
           <div className="flex text-xs text-gray-500 mb-2">
             <span>연구직군</span>
             <span className="mx-1">•</span>

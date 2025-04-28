@@ -19,7 +19,7 @@ export const CompanyIntroContent = ({ companyId }: CompanyIntroContentProps) => 
           <CompanySidebar companyId={companyId} activeTab="intro" />
         </div>
         <div className="flex-1">
-          <h1 className="text-xl font-bold mb-6">한눈에 보는 우리 회사, 미리 확인해 보세요!</h1>
+          <h1 className="text-xl font-bold mb-6">기본 기업정보</h1>
           <CompanyOverview />
           <CompanyIntroduction />
           <CurrentJobPostings />

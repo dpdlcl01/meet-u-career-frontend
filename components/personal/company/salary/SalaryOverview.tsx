@@ -62,50 +62,6 @@ export const SalaryOverview = () => {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="border rounded-md p-3">
-            <p className="text-xs text-gray-500 mb-1">2022년 대비</p>
-            <div className="flex items-center">
-              <TrendingUp className="h-4 w-4 text-green-500 mr-1" />
-              <p className="text-lg font-bold text-green-500">12.29%</p>
-            </div>
-          </div>
-
-          <div className="border rounded-md p-3">
-            <p className="text-xs text-gray-500 mb-1">제조/화학업 순위</p>
-            <p className="text-lg font-bold">17위</p>
-          </div>
-
-          <div className="border rounded-md p-3">
-            <div className="flex items-center mb-1">
-              <p className="text-xs text-gray-500">연봉정보 신뢰도</p>
-              <button
-                className="ml-1 text-gray-400 relative"
-                onClick={() => toggleTooltip("reliability")}
-                aria-label="신뢰도 정보"
-              >
-                <InfoIcon size={12} />
-                {showTooltip === "reliability" && (
-                  <div className="absolute z-10 w-64 p-3 bg-white border shadow-lg rounded-md text-xs text-left text-gray-700 -translate-x-1/2 left-1/2 mt-1">
-                    <p className="font-medium mb-1">신뢰도 산정 기준</p>
-                    <ul className="list-disc pl-4 space-y-1">
-                      <li>데이터 수집량</li>
-                      <li>최근 업데이트 시점</li>
-                      <li>데이터 일관성</li>
-                    </ul>
-                  </div>
-                )}
-              </button>
-            </div>
-            <div className="relative h-2 bg-gray-200 rounded-full">
-              <div className="absolute left-0 top-0 h-full w-[80%] bg-blue-500 rounded-full"></div>
-            </div>
-            <div className="flex justify-between text-xs mt-1">
-              <span>낮음</span>
-              <span className="text-blue-500 font-medium">높음</span>
-            </div>
-          </div>
-        </div>
       </div>
 
       <div className="bg-white border rounded-lg p-6">
@@ -146,7 +102,7 @@ export const SalaryOverview = () => {
           </div>
         </div>
         <div className="text-center text-sm text-green-500 font-medium">
-          2023년 동종 업종 평균 대비 <span className="font-bold">+44.52%</span> 높은 수준
+        2022년 대비 평균<span className="font-bold">+12.29%</span> 상승
         </div>
       </div>
     </div>
