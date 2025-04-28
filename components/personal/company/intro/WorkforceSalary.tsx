@@ -19,7 +19,7 @@ export const WorkforceSalary = () => {
     <div className="mb-10">
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-lg font-bold">인력 규모를 확인해 보세요!</h2>
-        <Link href="/personal/company/517/salary" className="text-xs text-gray-500 flex items-center">
+        <Link href="/personal/company/319/salary" className="text-xs text-gray-500 flex items-center">
           연봉정보 더보기
           <svg className="w-4 h-4 ml-1" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M8.59 16.59L10 18L16 12L10 6L8.59 7.41L13.17 12L8.59 16.59Z" fill="#2365f2"></path>

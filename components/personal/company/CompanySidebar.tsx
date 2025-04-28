@@ -31,7 +31,7 @@ export const CompanySidebar = ({ companyId, activeTab = "intro" }: CompanySideba
             />
           </div>
         </div>
-        <h2 className="text-base font-bold text-center"style={{ marginBottom: "5px"}}>(주)더존비즈온</h2>
+        <h2 className="text-base font-bold text-center"style={{ marginBottom: "5px"}}>로이컨설팅</h2>
         <p className="text-xs text-gray-500 text-center mb-3"style={{ marginBottom: "10px"}}>기업정보</p>
         <div className="flex justify-between items-center relative z-10">
           <button onClick={toggleLike} className="flex items-center text-xs text-gray-500 hover:text-gray-700" style={{ marginLeft: "20px"}}>
@@ -83,7 +83,7 @@ export const CompanySidebar = ({ companyId, activeTab = "intro" }: CompanySideba
           </li>
           <li>
             <Link
-              href={`/personal/company/jobs/517`}
+              href={`/personal/company/jobs/319`}
               className={`flex items-center px-3 py-2 text-sm rounded-md ${activeTab === "jobs" ? "bg-blue-50 text-blue-600 font-medium" : "text-gray-700 hover:bg-gray-50"
                 }`}
             >
