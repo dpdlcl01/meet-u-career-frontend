@@ -1,51 +1,52 @@
-"use client";
-
 import { useEffect, useState } from "react";
-import { connectSocket, disconnectSocket, subscribeToRoom, sendSocketMessage } from "@/lib/chatSocket";
-import { IMessage } from "@stomp/stompjs";
+import { Client } from "@stomp/stompjs";  // STOMP 클라이언트
+import { useUserStore } from "@/store/useUserStore";
 
-interface ChatMessage {
-  senderId: number;
-  senderName: string;
-  message: string;
-  isRead: number;
-  type: string;
-}
-
-export function useChatSocket(roomId: string | null) {
-  const [connected, setConnected] = useState(false);
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
+export const useChatSocket = (chatId: string | null) => {
+  const [messages, setMessages] = useState<any[]>([]);  // 메시지 상태
+  const [connected, setConnected] = useState(false);  // WebSocket 연결 상태
+  const [stompClient, setStompClient] = useState<Client | null>(null);  // STOMP 클라이언트
+  const { userInfo } = useUserStore();  // 사용자 정보 가져오기
 
   useEffect(() => {
-    if (!roomId) return;
+    if (!chatId || !userInfo) return;
 
-    const connectAndSubscribe = async () => {
-      try {
-        await connectSocket();  // ✅ 소켓 연결
+    // WebSocket 연결
+    const client = new Client({
+      brokerURL: "ws://localhost:8080/ws-stomp",  // 서버 WebSocket URL
+      connectHeaders: {
+        Authorization: `Bearer ${userInfo.accessToken}`,
+      },
+      onConnect: () => {
         setConnected(true);
-
-        subscribeToRoom(roomId, (message: IMessage) => {
-          const body = JSON.parse(message.body);
-          setMessages((prev) => [...prev, body]);
+        client.subscribe(`/sub/chat/room/${chatId}`, (message) => {
+          const receivedMessage = JSON.parse(message.body);
+          setMessages((prevMessages) => [...prevMessages, receivedMessage]);
         });
-      } catch (error) {
-        console.error("소켓 연결 실패", error);
-      }
-    };
+      },
+      onDisconnect: () => {
+        setConnected(false);
+      },
+    });
 
-    connectAndSubscribe();
+    client.activate();
+    setStompClient(client);
 
+    // 컴포넌트 언마운트 시 WebSocket 연결 종료
     return () => {
-      disconnectSocket(); // ✅ 컴포넌트 언마운트시 연결 끊기
-      setConnected(false);
+      client.deactivate();
     };
-  }, [roomId]);
+  }, [chatId, userInfo]);
 
-  const sendMessage = (payload: ChatMessage) => {
-    if (connected && roomId) {
-      sendSocketMessage(roomId, payload);
+  // 메시지 보내기
+  const sendMessage = (message: any) => {
+    if (stompClient && connected) {
+      stompClient.publish({
+        destination: "/pub/chat/send",
+        body: JSON.stringify(message),
+      });
     }
   };
 
-  return { connected, messages, sendMessage };
-}
+  return { messages, connected, sendMessage };
+};

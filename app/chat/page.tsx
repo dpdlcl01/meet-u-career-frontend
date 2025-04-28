@@ -1,20 +1,17 @@
 "use client";
 
 import { useState } from "react";
-import ChatDropdown from "@/components/home/ChatDropdown";
-import { ChatMain } from "@/components/chat/ChatMain"; // 네가 만든 거!
+import { ChatSidebar } from "@/components/chat/ChatSidebar"; // 채팅방 목록 컴포넌트
+import { ChatMain } from "@/components/chat/ChatMain"; // 채팅 메시지 컴포넌트
 
 export default function ChatPage() {
-  const [selectedChatId, setSelectedChatId] = useState<string | null>(null);
+  const [selectedChatId, setSelectedChatId] = useState<string | null>("1");
 
   return (
-    <div className="flex h-screen">
-      {/* 왼쪽: 채팅방 목록 */}
-      <div className="w-1/3 border-r border-gray-200 relative">
-        <ChatDropdown onSelectRoom={(roomId) => setSelectedChatId(roomId)} />
+    <div className="flex h-screen bg-white">
+      <div className="w-1/4">
+        <ChatSidebar selectedChatId={selectedChatId} onSelectChat={setSelectedChatId} />
       </div>
-
-      {/* 오른쪽: 채팅 메인 */}
       <div className="flex-1">
         <ChatMain chatId={selectedChatId} />
       </div>

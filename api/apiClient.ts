@@ -6,12 +6,10 @@ function getAuthHeaders(): { [key: string]: string } {
     typeof window !== "undefined"
       ? sessionStorage.getItem("accessToken")
       : null;
-  const isLocalhost =
-    typeof window !== "undefined" && window.location.hostname === "localhost";
 
-  if (token && isLocalhost) {
+  if (token) {
     return {
-      Authorization: `Bearer ${token}`,
+      Authorization: `Bearer ${token}`, // 🔥 무조건 Authorization
     };
   }
 
@@ -20,11 +18,11 @@ function getAuthHeaders(): { [key: string]: string } {
 
 // 공통 axios instance
 const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_BASE_URL || "",
+  baseURL: "http://localhost:8080", // ✅ 반드시 Spring Boot 서버 주소
   timeout: 10000,
+  withCredentials: true, // ✅ 쿠키 포함
 });
 
-// 반환값 타입을 any로 기본 설정
 export const apiClient = {
   get: async <T = any>(url: string, config = {}) =>
     api.get<T>(url, {
@@ -34,7 +32,6 @@ export const apiClient = {
         ...(config as any).headers,
       },
     }),
-
   post: async <T = any>(url: string, data?: any, config = {}) =>
     api.post<T>(url, data, {
       ...config,
@@ -43,7 +40,6 @@ export const apiClient = {
         ...(config as any).headers,
       },
     }),
-
   patch: async <T = any>(url: string, data?: any, config = {}) =>
     api.patch<T>(url, data, {
       ...config,
@@ -52,7 +48,6 @@ export const apiClient = {
         ...(config as any).headers,
       },
     }),
-
   put: async <T = any>(url: string, data?: any, config = {}) =>
     api.put<T>(url, data, {
       ...config,
@@ -61,7 +56,6 @@ export const apiClient = {
         ...(config as any).headers,
       },
     }),
-
   delete: async <T = any>(url: string, config = {}) =>
     api.delete<T>(url, {
       ...config,

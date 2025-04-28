@@ -1,66 +1,81 @@
-"use client"
+// src/components/personal/PersonalHeader.tsx
+"use client";
 
-import Link from "next/link"
-import { Menu, Bell, MessageSquare } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { NotificationDropdown } from "./NotificationDropdown"
-import { ChatDropdown } from "@/components/personal/mypage/ChatDropdown"
-import { ProfileDropdown } from "./ProfileDropdown"
-import { useState, useRef, useEffect } from "react"
-
-import { useSidebar } from "./SidebarProvider"
+import Link from "next/link";
+import { Menu, Bell, MessageSquare } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { NotificationDropdown } from "./NotificationDropdown";
+import ChatDropdown from "@/components/personal/mypage/ChatDropdown";
+import { ProfileDropdown } from "./ProfileDropdown";
+import { useState, useRef, useEffect } from "react";
+import { useSidebar } from "./SidebarProvider";
+import { useUserStore } from "@/store/useUserStore";
 
 export function PersonalHeader() {
-  const { toggleSidebar } = useSidebar()
-  const [isNotificationOpen, setIsNotificationOpen] = useState(false)
-  const [isChatOpen, setIsChatOpen] = useState(false)
-  const [isProfileOpen, setIsProfileOpen] = useState(false)
+  const { toggleSidebar } = useSidebar();
+  const { userInfo, isUserInfoHydrated, restoreUserInfo } = useUserStore();
 
-  const notificationRef = useRef<HTMLDivElement>(null)
-  const chatRef = useRef<HTMLDivElement>(null)
-  const profileRef = useRef<HTMLDivElement>(null)
+  // 각 드롭다운 오픈 상태
+  const [isNotificationOpen, setIsNotificationOpen] = useState(false);
+  const [isChatOpen, setIsChatOpen] = useState(false);
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
 
+  const notificationRef = useRef<HTMLDivElement>(null);
+  const chatRef = useRef<HTMLDivElement>(null);
+  const profileRef = useRef<HTMLDivElement>(null);
+
+  // 유저 정보 복구
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      // Check if notification dropdown is open and clicked outside
-      if (isNotificationOpen && notificationRef.current && !notificationRef.current.contains(event.target as Node)) {
-        setIsNotificationOpen(false)
+    restoreUserInfo();
+  }, [restoreUserInfo]);
+
+  // 외부 클릭 시 모든 드롭다운 닫기
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (
+        isNotificationOpen &&
+        notificationRef.current &&
+        !notificationRef.current.contains(e.target as Node)
+      ) {
+        setIsNotificationOpen(false);
       }
-
-      // Check if chat dropdown is open and clicked outside
-      if (isChatOpen && chatRef.current && !chatRef.current.contains(event.target as Node)) {
-        setIsChatOpen(false)
+      if (
+        isChatOpen &&
+        chatRef.current &&
+        !chatRef.current.contains(e.target as Node)
+      ) {
+        setIsChatOpen(false);
       }
-
-      // Check if profile dropdown is open and clicked outside
-      if (isProfileOpen && profileRef.current && !profileRef.current.contains(event.target as Node)) {
-        setIsProfileOpen(false)
+      if (
+        isProfileOpen &&
+        profileRef.current &&
+        !profileRef.current.contains(e.target as Node)
+      ) {
+        setIsProfileOpen(false);
       }
-    }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [isNotificationOpen, isChatOpen, isProfileOpen]);
 
-    // Add event listener when any dropdown is open
-    if (isNotificationOpen || isChatOpen || isProfileOpen) {
-      document.addEventListener("mousedown", handleClickOutside)
-    }
-
-    // Cleanup event listener
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside)
-    }
-  }, [isNotificationOpen, isChatOpen, isProfileOpen])
+  // 채팅방 선택 시: 드롭다운 닫고 새 창으로 이동
+  const handleSelectRoom = (roomId: string) => {
+    setIsChatOpen(false);
+    window.open(`/chat?roomId=${roomId}`, "ChatWindow", "width=800,height=600,resizable,scrollbars");
+  };
 
   return (
     <header className="fixed top-0 left-0 right-0 h-16 bg-white border-b border-gray-100 z-30">
       <div className="flex items-center justify-between h-full px-4">
+        {/* 좌측: 사이드바 토글 + 로고 */}
         <div className="flex items-center gap-2">
           <Button
             variant="ghost"
             size="icon"
-            className="text-gray-500 hover:text-gray-700"
             onClick={toggleSidebar}
             aria-label="Toggle sidebar"
           >
-            <Menu className="h-5 w-5" />
+            <Menu className="h-5 w-5 text-gray-500 hover:text-gray-700" />
           </Button>
           <Link href="/" className="flex items-center">
             <span className="text-lg font-bold text-blue-600">meet</span>
@@ -68,13 +83,14 @@ export function PersonalHeader() {
           </Link>
         </div>
 
+        {/* 우측: 알림 / 채팅 / 프로필 */}
         <div className="flex items-center gap-3">
+          {/* 알림 */}
           <div className="relative" ref={notificationRef}>
             <Button
               variant="ghost"
               size="icon"
-              className="relative rounded-full w-9 h-9 hover:bg-transparent"
-              onClick={() => setIsNotificationOpen(!isNotificationOpen)}
+              onClick={() => setIsNotificationOpen((o) => !o)}
               aria-label="Notifications"
             >
               <Bell className="h-[18px] w-[18px] text-gray-700" />
@@ -85,12 +101,12 @@ export function PersonalHeader() {
             {isNotificationOpen && <NotificationDropdown />}
           </div>
 
+          {/* 채팅 */}
           <div className="relative" ref={chatRef}>
             <Button
               variant="ghost"
               size="icon"
-              className="relative rounded-full w-9 h-9 hover:bg-transparent"
-              onClick={() => setIsChatOpen(!isChatOpen)}
+              onClick={() => setIsChatOpen((o) => !o)}
               aria-label="Messages"
             >
               <MessageSquare className="h-[18px] w-[18px] text-gray-700" />
@@ -98,22 +114,25 @@ export function PersonalHeader() {
                 2
               </span>
             </Button>
-            {isChatOpen && <ChatDropdown />}
+            {isChatOpen && isUserInfoHydrated && userInfo && (
+              <ChatDropdown onSelectRoom={handleSelectRoom} />
+            )}
           </div>
 
+          {/* 프로필 */}
           <div className="relative" ref={profileRef}>
             <Button
               variant="ghost"
               size="icon"
-              className="p-0 rounded-full w-9 h-9 hover:bg-transparent"
-              onClick={() => setIsProfileOpen(!isProfileOpen)}
+              onClick={() => setIsProfileOpen((o) => !o)}
+              aria-label="Profile"
             >
-              <div className="h-9 w-9 rounded-full bg-gray-200 overflow-hidden">{/* Profile image placeholder */}</div>
+              <div className="h-9 w-9 rounded-full bg-gray-200 overflow-hidden" />
             </Button>
             {isProfileOpen && <ProfileDropdown />}
           </div>
         </div>
       </div>
     </header>
-  )
+  );
 }

@@ -1,67 +1,92 @@
+"use client";
+
 import { useNotificationStore } from "@/store/useNotificationStore";
 import { useUserStore } from "@/store/useUserStore";
 import { Client } from "@stomp/stompjs";
 import SockJS from "sockjs-client";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 
-// 소켓 연결 URL 분기 처리
 const getSocketUrl = () => {
-    if (typeof window !== "undefined") {
-        const hostname = window.location.hostname;
-        if (hostname === "localhost") {
-            return "http://localhost:8080/ws/notification"; // 로컬 개발용
-        } else {
-            return "https://meet-u-career.com/ws/notification"; // 배포 도메인 주소
-        }
+  if (typeof window !== "undefined") {
+    const hostname = window.location.hostname;
+    if (hostname === "localhost") {
+      return "http://localhost:8080/ws/notification";
+    } else {
+      return "https://meet-u-career.com/ws/notification";
     }
-    return "";
+  }
+  return "";
 };
 
 export const useNotificationSocket = () => {
-    const { userInfo } = useUserStore();
-    const { addNotifications } = useNotificationStore();
+  const { userInfo } = useUserStore();
+  const { addNotifications } = useNotificationStore();
+  const clientRef = useRef<Client | null>(null);
 
-    useEffect(() => {
-        if (!userInfo) return;
+  useEffect(() => {
+    if (!userInfo) return;
 
-        const SOCKET_URL = getSocketUrl();
-        const socket = new SockJS(SOCKET_URL);
+    const SOCKET_URL = getSocketUrl();
+    const socket = new SockJS(SOCKET_URL);
 
-        const client = new Client({
-            webSocketFactory: () => socket,
-            reconnectDelay: 5000,
-            onConnect: () => {
-                console.log("🟢 WebSocket 연결 성공 (SockJS)");
+    const client = new Client({
+      webSocketFactory: () => socket,
+      reconnectDelay: 5000,
+      onConnect: () => {
+        console.log("🟢 WebSocket 연결 성공 (SockJS)");
 
-                client.subscribe(`/topic/notification/${userInfo.accountId}`, (message) => {
-                    try {
-                        // console.log("수신된 메시지:", message.body);
+        // ✅ 알림 구독
+        client.subscribe(`/sub/notification/${userInfo.accountId}`, (message) => {
+          try {
+            const body = JSON.parse(message.body);
 
-                        const body = JSON.parse(message.body);
-
-                        addNotifications([
-                            {
-                                id: Date.now(), // 임시 ID
-                                message: body.message,
-                                isRead: 0,
-                                createdAt: body.createdAt,
-                                notificationType: body.notificationType,
-                            },
-                        ]);
-                    } catch (error) {
-                        console.error("메시지 파싱 에러:", error);
-                    }
-                });
-            },
-            onStompError: (frame) => {
-                console.error("Broker reported error:", frame);
-            },
+            addNotifications([
+              {
+                id: Date.now(), // 임시 ID
+                message: body.message,
+                isRead: 0,
+                createdAt: body.createdAt,
+                notificationType: body.notificationType,
+              },
+            ]);
+          } catch (error) {
+            console.error("메시지 파싱 에러:", error);
+          }
         });
+      },
+      onStompError: (frame) => {
+        console.error("Broker reported error:", frame);
+      },
+    });
 
-        client.activate();
+    client.activate();
+    clientRef.current = client;
 
-        return () => {
-            client.deactivate();
-        };
-    }, [userInfo, addNotifications]);
+    return () => {
+      client.deactivate();
+    };
+  }, [userInfo, addNotifications]);
+
+  /**
+   * ✅ 알림 발행 함수
+   */
+  const sendNotification = (message: string, notificationType: string) => {
+    if (!clientRef.current || !userInfo) return;
+
+    const payload = {
+      receiverId: userInfo.accountId, // 수신자 ID
+      message,
+      createdAt: new Date().toISOString(), // ISO 포맷
+      notificationType, // 타입 예: "MESSAGE", "ALERT"
+    };
+
+    clientRef.current.publish({
+      destination: "/pub/notification/send",
+      body: JSON.stringify(payload),
+    });
+
+    console.log("🚀 알림 발행:", payload);
+  };
+
+  return { sendNotification };
 };

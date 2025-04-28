@@ -1,60 +1,68 @@
-"use client"
+import { useEffect, useState } from "react";
+import { apiClient } from "@/api/apiClient";
+import { useUserStore } from "@/store/useUserStore";
+import { useAuthStore } from "@/store/useAuthStore";
 
-import { useEffect, useState } from "react"
-import { apiClient } from "@/api/apiClient"
-
-interface ChatRoom {
-  roomId: number
-  companyId: number
-  businessAccountId: number
-  personalAccountId: number
-  status: number
-  unreadCount: number
+export interface Room {
+  roomId: number;             // DB에서 숫자로 내려오는 방 ID
+  businessAccountId: number;
+  personalAccountId: number;
+  companyName: string;
+  unreadCount: number;
 }
 
 export function useChatRooms() {
-  const [chatRooms, setChatRooms] = useState<ChatRoom[]>([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const { accessToken } = useAuthStore();
+  const { userInfo } = useUserStore();
+
+  const [chatRooms, setChatRooms] = useState<Room[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchChatRooms = async () => {
+    const fetchRooms = async () => {
       try {
-        const response = await apiClient.get<{ data: ChatRoom[] }>("/api/chat/rooms")
-        setChatRooms(response.data.data)
-      } catch (err) {
-        console.error("❌ 채팅방 리스트 가져오기 실패", err)
-        setError("채팅방을 불러오는데 실패했습니다.")
+        const resp = await apiClient.get<{ data: Room[] }>(
+          "/api/chat/rooms",
+          {
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+            },
+          }
+        );
+        setChatRooms(resp.data.data);
+      } catch (err: any) {
+        setError(err.message || "채팅방 조회 실패");
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
-      console.log("현재 accessToken:", sessionStorage.getItem("accessToken"));
+    };
 
+    if (accessToken && userInfo) {
+      fetchRooms();
     }
+  }, [accessToken, userInfo]);
 
-    fetchChatRooms()
-  }, [])
-
-  // markRoomAsRead 함수 추가
   const markRoomAsRead = async (roomId: number) => {
     try {
-      await apiClient.post(`/api/chat/rooms/${roomId}/read`)
-      // 상태 업데이트
+      await apiClient.post(
+        `/api/chat/rooms/${roomId}/read`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
       setChatRooms((prev) =>
-        prev.map((room) =>
-          room.roomId === roomId ? { ...room, unreadCount: 0 } : room
+        prev.map((r) =>
+          r.roomId === roomId ? { ...r, unreadCount: 0 } : r
         )
-      )
-      console.log(`✅ 채팅방 ${roomId} 읽음 처리 완료 (프론트 상태 반영)`)
-    } catch (error) {
-      console.error("❌ 채팅방 읽음 처리 실패", error)
+      );
+    } catch {
+      /* 무시 */
     }
-  }
+  };
 
-  return {
-    chatRooms,
-    loading,
-    error,
-    markRoomAsRead, // markRoomAsRead를 반환
-  }
+  return { chatRooms, loading, error, markRoomAsRead };
 }

@@ -1,17 +1,25 @@
 "use client";
 
+import { useEffect } from "react";
+import { fetchMyInfo } from "@/api/fetchMyInfo";
 import { useAuthGuard } from "@/hooks/useAuthGuard";
+import { useUserStore } from "@/store/useUserStore"; // ✅ 추가
 import { PersonalHeader } from "@/components/personal/mypage/PersonalHeader";
 import { PersonalSidebar } from "@/components/personal/mypage/PersonalSidebar";
 import { ApplicationsContent } from "@/components/personal/mypage/applications/ApplicationsContent";
 import { useSidebar } from "@/components/personal/mypage/SidebarProvider";
 
 export default function ApplicationsPage() {
-  const isChecking = useAuthGuard("personal"); // personal만 접근 가능
-
+  const isChecking = useAuthGuard("personal");
   const { sidebarOpen } = useSidebar();
+  const { isUserInfoHydrated } = useUserStore(); // ✅ userInfo 준비 여부 가져오기
 
-  if (isChecking) return null; // 검사 중일 땐 아무것도 렌더링하지 않음
+  useEffect(() => {
+    fetchMyInfo();
+  }, []);
+
+  if (isChecking || !isUserInfoHydrated) return null; 
+  // ✅ userInfo까지 세팅 완료될 때까지 아무것도 렌더링하지 않음
 
   return (
     <main className="min-h-screen bg-gray-50">
