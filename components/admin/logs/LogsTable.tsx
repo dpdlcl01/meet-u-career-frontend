@@ -1,6 +1,6 @@
 import { Info, X } from "lucide-react";
 import { useEffect, useState } from "react";
-import axios from "axios";
+import { apiClient } from "@/api/apiClient";
 import React from "react";
 
 export interface Log {
@@ -45,12 +45,20 @@ export default function LogsTable({ filter }: LogsTableProps) {
   const [selectedLog, setSelectedLog] = useState<Log | null>(null);
 
   useEffect(() => {
-    setLoading(true);
-    axios
-      .get("/api/admin/logs")
-      .then((res) => setLogs(res.data.data))
-      .catch((err) => setError(err.message))
-      .finally(() => setLoading(false));
+    const fetchLogs = async () => {
+      setLoading(true);
+      try {
+        const response = await apiClient.get<{ data: Log[] }>("/api/admin/logs", {
+          params: filter,
+        });
+        setLogs(response.data.data);
+      } catch (err: any) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchLogs();
   }, [filter]);
 
   if (loading) return <div>로딩 중...</div>;

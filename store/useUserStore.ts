@@ -20,7 +20,7 @@ interface UserStoreState {
 const isLocalhost =
   typeof window !== "undefined" && window.location.hostname === "localhost";
 
-export const useUserStore = create<UserStoreState>((set) => ({
+export const useUserStore = create<UserStoreState>((set: any) => ({
   userInfo: null,
   isUserInfoHydrated: false,
   isLocalhost:
@@ -29,7 +29,7 @@ export const useUserStore = create<UserStoreState>((set) => ({
   /**
    * 유저 정보 저장
    */
-  setUserInfo: (userInfo) => set({ userInfo, isUserInfoHydrated: true }),
+  setUserInfo: (userInfo: UserInfo) => set({ userInfo, isUserInfoHydrated: true }),
 
   /**
    * 유저 정보 삭제

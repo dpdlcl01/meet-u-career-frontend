@@ -1,9 +1,10 @@
 "use client"
 
-import { Grid, List } from "lucide-react"
+import { Grid, List, ChevronDown } from "lucide-react"
 import { TalentCard } from "./TalentCard"
-// import { Pagination } from "./Pagination"
+import { Pagination } from "./Pagination"
 import { useState } from "react"
+import { Button } from "@/components/ui/button"
 
 interface TalentDto {
   id: number
@@ -153,9 +154,9 @@ export const TalentsGrid = ({ talents, searchQuery, filters }: TalentsGridProps)
         ))}
       </div>
 
-      {/* <div className="mt-8 flex justify-center">
+      <div className="mt-8 flex justify-center">
         <Pagination />
-      </div> */}
+      </div>
     </div>
   )
 }

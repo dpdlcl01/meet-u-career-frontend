@@ -1,40 +1,28 @@
-// lib/adminApi.ts
+import { apiClient } from "@/api/apiClient";
+import type { AdminData } from "@/components/admin/admins/AdminModal";
 
-import { apiClient } from "@/api/apiClient"
-import type { AdminData } from "@/types/admin/AdminData"
-
-// 관리자 목록 조회
-export const fetchAdmins = async (keyword?: string): Promise<AdminData[]> => {
-  const response = await apiClient.get(`/api/admin/accounts`, {
-    params: keyword ? { keyword } : {},
-  })
-  return response.data.data
+/** Fetch list of admins, optional search keyword */
+export async function fetchAdmins(keyword = ""): Promise<AdminData[]> {
+  const response = await apiClient.get<{ data: AdminData[] }>("/api/admins", {
+    params: { keyword },
+  });
+  return response.data.data;
 }
 
-// 관리자 생성
-export const createAdmin = async (admin: Partial<AdminData>) => {
-  const payload = {
-    name: admin.name,
-    email: admin.email,
-    password: admin.password,
-    role: admin.role,
-  }
-  return apiClient.post(`/api/admin/accounts`, payload)
+/** Create a new admin account */
+export async function createAdmin(data: Omit<AdminData, "id" | "confirmPassword"> & { password: string }): Promise<AdminData> {
+  const response = await apiClient.post<{ data: AdminData }>("/api/admins", data);
+  return response.data.data;
 }
 
-// 관리자 수정
-export const updateAdmin = async (admin: Partial<AdminData> & { id: number }) => {
-  const payload = {
-    id: admin.id,
-    name: admin.name,
-    email: admin.email,
-    password: admin.password,
-    role: admin.role,
-  }
-  return apiClient.put(`/api/admin/accounts`, payload)
+/** Update an existing admin account */
+export async function updateAdmin(data: Partial<Omit<AdminData, "confirmPassword">> & { id: number }): Promise<AdminData> {
+  const { id, ...payload } = data;
+  const response = await apiClient.patch<{ data: AdminData }>(`/api/admins/${id}`, payload);
+  return response.data.data;
 }
 
-// 관리자 삭제
-export const deleteAdmin = async (id: number) => {
-  return apiClient.delete(`/api/admin/accounts/${id}`)
+/** Delete an admin by ID */
+export async function deleteAdmin(id: number): Promise<void> {
+  await apiClient.delete(`/api/admins/${id}`);
 }

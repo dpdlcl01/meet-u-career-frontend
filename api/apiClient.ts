@@ -22,6 +22,7 @@ function getAuthHeaders(): { [key: string]: string } {
 const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_BASE_URL || "",
   timeout: 10000,
+  withCredentials: true, // include cookies for auth
 });
 
 // 반환값 타입을 any로 기본 설정
