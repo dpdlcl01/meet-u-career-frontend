@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import axios from "axios";
-import Swal from "sweetalert2";
 
 interface Interview {
   id: number;
@@ -75,11 +74,11 @@ export function ReviewModal({ interview, onClose, onComplete }: ReviewModalProps
       };
 
       await axios.post("/api/personal/interview-reviews", payload);
-      Swal.fire("작성 완료", "면접 후기가 저장되었습니다.", "success");
+      alert("면접 후기가 저장되었습니다.");
       onComplete(interview.id);
       onClose();
     } catch (err) {
-      Swal.fire("오류", "후기 저장 중 문제가 발생했습니다.", "error");
+      alert("후기 저장 중 문제가 발생했습니다.");
       console.error("❌ 후기 저장 실패", err);
     }
   };
@@ -151,11 +150,10 @@ export function ReviewModal({ interview, onClose, onComplete }: ReviewModalProps
           type="button"
           onClick={handleSubmit}
           disabled={!editable}
-          className={`w-full mt-6 py-2 px-4 rounded ${
-            editable
-              ? "bg-blue-600 text-white hover:bg-blue-700"
-              : "bg-gray-200 text-gray-500 cursor-not-allowed"
-          }`}
+          className={`w-full mt-6 py-2 px-4 rounded ${editable
+            ? "bg-blue-600 text-white hover:bg-blue-700"
+            : "bg-gray-200 text-gray-500 cursor-not-allowed"
+            }`}
         >
           {editable ? "후기 저장" : "수정 기한 만료"}
         </button>

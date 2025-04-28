@@ -14,7 +14,7 @@ export const SearchBar = () => {
           <div key={index} className="bg-white border border-gray-100 rounded-md p-4 hover:shadow-md transition-shadow cursor-pointer">
             <div className="w-12 h-12 bg-gray-100 mb-3">
               <Image
-                src="/images/thumbnail/generic-app-icon.png"
+                src="https://meet-u-storage.s3.ap-northeast-2.amazonaws.com/static/thumbnail/generic-app-icon.png"
                 alt="로고"
                 width={120}
                 height={35}

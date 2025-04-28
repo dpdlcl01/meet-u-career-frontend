@@ -80,7 +80,7 @@ export const BusinessHeader = () => {
         <div className="flex items-center space-x-8">
           <Link href="/business/dashboard" className="text-xl font-semibold">
             <Image
-              src="/images/logo/logo_business_re.png"
+              src="https://meet-u-storage.s3.ap-northeast-2.amazonaws.com/static/logo/logo_business_re.png"
               alt="로고"
               width={120}
               height={35}

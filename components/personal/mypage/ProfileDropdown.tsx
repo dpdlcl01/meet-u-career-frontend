@@ -16,7 +16,7 @@ export function ProfileDropdown() {
         <div className="flex items-center">
           <div className="flex-shrink-0">
             <Image
-              src="/images/etc/vibrant-street-market.png"
+              src="https://meet-u-storage.s3.ap-northeast-2.amazonaws.com/static/etc/vibrant-street-market.png"
               alt="User profile"
               width={40}
               height={40}

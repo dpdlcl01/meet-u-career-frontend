@@ -125,7 +125,7 @@ export const CompanyReviewDetail = ({ companyId }: CompanyReviewDetailProps) => 
           <div className="bg-white rounded-lg shadow-sm p-6">
             <div className="flex items-start gap-4">
               <div className="bg-white p-2 rounded-md border w-24 h-24 flex items-center justify-center">
-                <Image src={company.logo || "/images/etc/placeholder.svg"} alt={`${company.name} 로고`} width={80} height={80} />
+                <Image src={company.logo || "https://meet-u-storage.s3.ap-northeast-2.amazonaws.com/static/etc/placeholder.svg"} alt={`${company.name} 로고`} width={80} height={80} />
               </div>
               <div className="flex-1">
                 <div className="flex items-center gap-2">
@@ -165,27 +165,27 @@ export const CompanyReviewDetail = ({ companyId }: CompanyReviewDetailProps) => 
               </div>
 
               <button className="flex items-center gap-2 bg-gray-50 px-4 py-2 rounded-md">
-                <Image src="/images/etc/generic-app-icon.png" alt="회사 정보" width={36} height={36} />
+                <Image src="https://meet-u-storage.s3.ap-northeast-2.amazonaws.com/static/etc/generic-app-icon.png" alt="회사 정보" width={36} height={36} />
                 <span className="text-sm">회사에 대해 기재</span>
               </button>
 
               <button className="flex items-center gap-2 bg-gray-50 px-4 py-2 rounded-md">
-                <Image src="/images/etc/generic-app-icon.png" alt="리뷰 작성" width={36} height={36} />
+                <Image src="https://meet-u-storage.s3.ap-northeast-2.amazonaws.com/static/etc/generic-app-icon.png" alt="리뷰 작성" width={36} height={36} />
                 <span className="text-sm">리뷰쓰기</span>
               </button>
 
               <button className="flex items-center gap-2 bg-gray-50 px-4 py-2 rounded-md">
-                <Image src="/images/etc/generic-app-icon.png" alt="채용 정보" width={36} height={36} />
+                <Image src="https://meet-u-storage.s3.ap-northeast-2.amazonaws.com/static/etc/generic-app-icon.png" alt="채용 정보" width={36} height={36} />
                 <span className="text-sm">채용공고 보기</span>
               </button>
 
               <button className="flex items-center gap-2 bg-gray-50 px-4 py-2 rounded-md">
-                <Image src="/images/etc/generic-app-icon.png" alt="연봉 정보" width={36} height={36} />
+                <Image src="https://meet-u-storage.s3.ap-northeast-2.amazonaws.com/static/etc/generic-app-icon.png" alt="연봉 정보" width={36} height={36} />
                 <span className="text-sm">평균 연봉 4000만원</span>
               </button>
 
               <button className="flex items-center gap-2 bg-gray-50 px-4 py-2 rounded-md">
-                <Image src="/images/etc/generic-app-icon.png" alt="면접 후기" width={36} height={36} />
+                <Image src="https://meet-u-storage.s3.ap-northeast-2.amazonaws.com/static/etc/generic-app-icon.png" alt="면접 후기" width={36} height={36} />
                 <span className="text-sm">면접 후 합격</span>
               </button>
             </div>
@@ -202,7 +202,7 @@ export const CompanyReviewDetail = ({ companyId }: CompanyReviewDetailProps) => 
             <div className="bg-teal-500 text-white rounded-lg p-6 mb-6">
               <div className="flex items-center gap-4">
                 <div className="bg-white/20 rounded-full p-3">
-                  <Image src="/images/etc/diverse-group-chatting.png" alt="메시지 아이콘" width={40} height={40} />
+                  <Image src="https://meet-u-storage.s3.ap-northeast-2.amazonaws.com/static/etc/diverse-group-chatting.png" alt="메시지 아이콘" width={40} height={40} />
                 </div>
                 <div>
                   <h2 className="text-lg font-bold">

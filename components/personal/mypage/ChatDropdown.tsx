@@ -31,14 +31,14 @@ export default function ChatDropdown({ onSelectRoom }: ChatDropdownProps) {
         const response = await fetch("/api/chat/rooms", {
           method: "GET",
           headers: {
-            Authorization: `Bearer ${accessToken}`,
+            Authorization: `Bearer ${accessToken}`, // 수정
             "Content-Type": "application/json",
           },
           credentials: "include",
         })
 
         if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`)
+          throw new Error(`HTTP error! status: ${response.status}`) // 수정
         }
 
         const result = await response.json()
@@ -59,7 +59,6 @@ export default function ChatDropdown({ onSelectRoom }: ChatDropdownProps) {
     }
 
     if (isAuthHydrated && isUserInfoHydrated) {
-      // 🔥 둘 다 복구가 완료됐을 때만 fetch
       fetchRooms()
     }
   }, [accessToken, userInfo, isAuthHydrated, isUserInfoHydrated])

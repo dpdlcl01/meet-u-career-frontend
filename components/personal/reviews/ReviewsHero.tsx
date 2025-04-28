@@ -42,7 +42,7 @@ export const ReviewsHero = ({ onSearch }: Props) => {
           </div>
           <div className="md:w-1/2 flex justify-center">
             <img
-              src="/images/review/review_01.png"
+              src="https://meet-u-storage.s3.ap-northeast-2.amazonaws.com/static/review/review_01.png"
               alt="기업 리뷰 작성하는 일러스트"
               className="max-w-full h-auto"
               width={400}

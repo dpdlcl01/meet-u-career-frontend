@@ -216,7 +216,7 @@ export const Post = ({ post }: PostProps) => {
       console.error("좋아요 처리 실패", error)
     }
   }
-  
+
 
   //----------------------------------------
   // 댓글 관련 함수
@@ -256,7 +256,7 @@ export const Post = ({ post }: PostProps) => {
       alert("댓글 내용을 입력해주세요.");
       return;
     }
-  
+
     try {
       const token = sessionStorage.getItem('accessToken');
       const response = await axios.post(
@@ -272,24 +272,24 @@ export const Post = ({ post }: PostProps) => {
           },
         }
       );
-  
+
       if (response.status === 200) {
         alert("댓글이 등록되었습니다.");
-        setCommentContent(""); 
-        setCommentsCount(prev => prev + 1); 
-        fetchComments(); 
+        setCommentContent("");
+        setCommentsCount(prev => prev + 1);
+        fetchComments();
       }
     } catch (error) {
       console.error("댓글 작성 실패", error);
       alert("댓글 작성 실패했습니다.");
     }
   }
-  
+
 
   // 댓글 삭제
   const handleDeleteComment = async (commentId: number) => {
     if (!confirm("댓글을 삭제하시겠습니까?")) return;
-  
+
     try {
       const token = sessionStorage.getItem('accessToken');
       await axios.post(
@@ -302,20 +302,20 @@ export const Post = ({ post }: PostProps) => {
         }
       );
       alert("댓글이 삭제되었습니다!");
-  
+
       // 댓글 리스트에서 삭제한 댓글 제거
       setComments((prevComments) => prevComments.filter((comment) => comment.id !== commentId));
-  
+
       // 댓글 수 -1 감소
       setCommentsCount((prev) => Math.max(0, prev - 1));
-  
+
     } catch (error) {
       console.error("댓글 삭제 실패", error);
       alert("댓글 삭제에 실패했습니다.");
     }
   };
-  
-  
+
+
 
   // 댓글 수정 모드로 전환
   const handleEditClick = (comment: Comment) => {
@@ -326,7 +326,7 @@ export const Post = ({ post }: PostProps) => {
   // 댓글 수정 저장
   const handleSaveEdit = async () => {
     if (editingCommentId === null) return;
-  
+
     try {
       const token = sessionStorage.getItem('accessToken');
       await axios.post(
@@ -342,9 +342,9 @@ export const Post = ({ post }: PostProps) => {
           },
         }
       );
-  
+
       alert("댓글이 수정되었습니다!");
-  
+
       // ✅ 수정된 댓글을 바로 반영
       setComments((prevComments) =>
         prevComments.map((comment) =>
@@ -353,16 +353,29 @@ export const Post = ({ post }: PostProps) => {
             : comment
         )
       );
-  
+
       setEditingCommentId(null);
       setEditingContent("");
-  
+
     } catch (error) {
       console.error("댓글 수정 실패", error);
       alert("댓글 수정에 실패했습니다.");
     }
   };
-  
+
+  // 공유 버튼 클릭 핸들러
+  const handleShare = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    try {
+      const shareUrl = `${window.location.origin}/personal/community/${post.id}`;
+      await navigator.clipboard.writeText(shareUrl);
+      alert("링크가 복사되었습니다!");
+    } catch (error) {
+      console.error("링크 복사 실패", error);
+      alert("링크 복사에 실패했습니다.");
+    }
+  };
+
 
   //----------------------------------------
   // 컴포넌트 렌더링
@@ -374,9 +387,9 @@ export const Post = ({ post }: PostProps) => {
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center">
             <img
-              src={post.author.avatar || "/images/etc/profile.png"}
+              src={post.author.avatar || "https://meet-u-storage.s3.ap-northeast-2.amazonaws.com/static/etc/profile.png"}
               onError={(e) => {
-                (e.target as HTMLImageElement).src = "/images/etc/profile.png";
+                (e.target as HTMLImageElement).src = "https://meet-u-storage.s3.ap-northeast-2.amazonaws.com/static/etc/profile.png";
               }}
               alt="작성자 프로필"
               className="w-10 h-10 rounded-full object-cover mr-3"
@@ -455,7 +468,8 @@ export const Post = ({ post }: PostProps) => {
         </button>
 
         {/* 공유 버튼 */}
-        <button className="ml-auto text-gray-500 hover:text-gray-700">
+        <button className="ml-auto text-gray-500 hover:text-gray-700"
+          onClick={handleShare}>
           <Share2 className="h-5 w-5" />
         </button>
       </div>
@@ -467,9 +481,9 @@ export const Post = ({ post }: PostProps) => {
           <div className="p-4 space-y-4">
             {comments.map((comment) => (
               <div key={comment.id} className="flex items-start gap-3">
-                <img src={comment.authorAvatar || "/images/etc/profile.png"} alt="프로필" className="w-8 h-8 rounded-full object-cover"
+                <img src={comment.authorAvatar || "https://meet-u-storage.s3.ap-northeast-2.amazonaws.com/static/etc/profile.png"} alt="프로필" className="w-8 h-8 rounded-full object-cover"
                   onError={(e) => {
-                    (e.target as HTMLImageElement).src = "/images/etc/profile.png";
+                    (e.target as HTMLImageElement).src = "https://meet-u-storage.s3.ap-northeast-2.amazonaws.com/static/etc/profile.png";
                   }}
                 />
                 <div className="flex-1 bg-gray-100 p-2 rounded-md">
@@ -535,7 +549,7 @@ export const Post = ({ post }: PostProps) => {
           {/* 댓글 입력창 */}
           <div className="flex items-start gap-3 p-4 border-t">
             <img
-              src="/images/etc/profile.png"
+              src="https://meet-u-storage.s3.ap-northeast-2.amazonaws.com/static/etc/profile.png"
               alt="내 프로필"
               className="w-10 h-10 rounded-full object-cover"
             />
@@ -564,7 +578,7 @@ export const Post = ({ post }: PostProps) => {
       {isEditModalOpen && (
         <CreatePostModal
           onClose={() => setIsEditModalOpen(false)}
-          profileImageUrl={post.author.avatar || "/images/etc/profile.png"}
+          profileImageUrl={post.author.avatar || "https://meet-u-storage.s3.ap-northeast-2.amazonaws.com/static/etc/profile.png"}
           userName={post.author.name}
           initialContent={post.content}
           initialTag={post.tags?.[0]?.replace("#", "") ?? null}

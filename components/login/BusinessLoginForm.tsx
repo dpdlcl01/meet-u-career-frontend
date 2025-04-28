@@ -24,7 +24,7 @@ export const BusinessLoginForm = () => {
 
   // 저장된 아이디 복구
   useEffect(() => {
-    const savedUserId = localStorage.getItem("savedBusinessId");
+    const savedUserId = sessionStorage.getItem("savedBusinessId");
     if (savedUserId) {
       setUserId(savedUserId);
       setRememberMe(true);
@@ -55,9 +55,9 @@ export const BusinessLoginForm = () => {
 
           // 로그인 성공 후 아이디 저장
           if (rememberMe) {
-            localStorage.setItem("savedBusinessId", userId);
+            sessionStorage.setItem("savedBusinessId", userId);
           } else {
-            localStorage.removeItem("savedBusinessId");
+            sessionStorage.removeItem("savedBusinessId");
           }
 
           await fetchMyInfo();

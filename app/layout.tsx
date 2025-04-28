@@ -7,7 +7,7 @@ export const metadata = {
   description: "구직자와 기업을 이어주는 구인구직 플랫폼",
   generator: "v0.dev",
   icons: {
-    icon: "/images/favicon/favicon_3.png",
+    icon: "https://meet-u-storage.s3.ap-northeast-2.amazonaws.com/static/favicon/favicon_3.png",
   },
 };
 

@@ -28,15 +28,14 @@ export const Footer = () => {
         </div>
 
         <div className="text-sm text-gray-500 mb-6">
-          <h3 className="font-medium mb-2">사업자</h3>
           <p className="text-xs mb-1">서비스 고객센터 | 02-123-4567 (평일 09:00~18:00, 점심 시간 12:00~13:00)</p>
           <p className="text-xs mb-1">
-            (주) 미트유 | 대표: 홍길동 | 사업자등록번호: 123-45-67890 | 통신판매업 신고번호: 제2023-서울강남-12345호
+            (주) MeetU | 대표: 홍동화 | 사업자등록번호: 123-45-67890 | 통신판매업 신고번호: 제2023-서울강남-12345호
           </p>
           <p className="text-xs mb-1">
-            주소: 서울특별시 강남구 테헤란로 123, 45층 | 대표번호: 02-123-4567 | 이메일: support@meetu.co.kr
+            주소: 서울특별시 강남구 테헤란로 132 8층 쌍용교육센터 | 대표번호: 02-123-4567 | 이메일: support@meetu.co.kr
           </p>
-          <p className="text-xs mb-4">Copyright (c) 미트유(주). All rights reserved.</p>
+          <p className="text-xs mb-4">Copyright (c) MeetU(주). All rights reserved.</p>
         </div>
 
         <div className="flex gap-2 justify-end">

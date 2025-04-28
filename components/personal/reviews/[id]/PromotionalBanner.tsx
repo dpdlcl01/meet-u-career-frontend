@@ -20,7 +20,7 @@ export const PromotionalBanner = ({ reviewCount }: Props) => {
         </div>
         <div className="absolute right-0 bottom-0">
           <Image
-            src="/images/review/online-review-typing.png"
+            src="https://meet-u-storage.s3.ap-northeast-2.amazonaws.com/static/review/online-review-typing.png"
             alt="리뷰 작성 일러스트"
             width={180}
             height={120}

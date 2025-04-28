@@ -24,7 +24,7 @@ export const Card = ({
       <Link href={href} className="block">
         <div className="bg-white border rounded-md overflow-hidden transition-all group-hover:shadow-md">
           <div className="relative aspect-video bg-gray-100">
-            {imageUrl && <Image src={imageUrl || "/images/etc/placeholder.svg"} alt={title} fill className="object-cover" />}
+            {imageUrl && <Image src={imageUrl || "https://meet-u-storage.s3.ap-northeast-2.amazonaws.com/static/etc/placeholder.svg"} alt={title} fill className="object-cover" />}
             {tag && (
               <div className="absolute bottom-2 left-2 bg-yellow-400 text-xs font-medium px-2 py-0.5 rounded">
                 {tag}

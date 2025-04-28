@@ -89,7 +89,7 @@ export function InterviewCard({ interview }: InterviewCardProps) {
       <div className="flex items-center mb-2">
         <div className="h-10 w-10 rounded-md overflow-hidden flex-shrink-0 border border-gray-200 mr-3">
           <Image
-            src={interview.logo || "/images/etc/placeholder.svg"}
+            src={interview.logo || "https://meet-u-storage.s3.ap-northeast-2.amazonaws.com/static/etc/placeholder.svg"}
             alt={interview.company}
             width={40}
             height={40}

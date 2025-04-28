@@ -13,10 +13,10 @@ export const PromotionalCarousel = () => {
   const intervalRef = useRef<NodeJS.Timeout | null>(null)
 
   const slides: CarouselSlide[] = [
-    { image: "/images/carousel/signup_carousel_01.png" },
-    { image: "/images/carousel/signup_carousel_02.png" },
-    { image: "/images/carousel/signup_carousel_03.png" },
-    { image: "/images/carousel/signup_carousel_04.png" },
+    { image: "https://meet-u-storage.s3.ap-northeast-2.amazonaws.com/static/carousel/signup_carousel_01.png" },
+    { image: "https://meet-u-storage.s3.ap-northeast-2.amazonaws.com/static/carousel/signup_carousel_02.png" },
+    { image: "https://meet-u-storage.s3.ap-northeast-2.amazonaws.com/static/carousel/signup_carousel_03.png" },
+    { image: "https://meet-u-storage.s3.ap-northeast-2.amazonaws.com/static/carousel/signup_carousel_04.png" },
   ]
 
   // Manual navigation
@@ -71,13 +71,12 @@ export const PromotionalCarousel = () => {
       {slides.map((slide, index) => (
         <div
           key={index}
-          className={`absolute inset-0 transition-all duration-1000 ease-in-out ${
-            currentSlide === index
-              ? "opacity-100 translate-x-0 z-10"
-              : index < currentSlide
+          className={`absolute inset-0 transition-all duration-1000 ease-in-out ${currentSlide === index
+            ? "opacity-100 translate-x-0 z-10"
+            : index < currentSlide
               ? "opacity-0 -translate-x-full z-0"
               : "opacity-0 translate-x-full z-0"
-          }`}
+            }`}
           aria-hidden={currentSlide !== index}
         >
           <div className="h-full flex flex-col justify-center items-center px-8">
@@ -97,9 +96,8 @@ export const PromotionalCarousel = () => {
                 <button
                   key={i}
                   onClick={() => goToSlide(i)}
-                  className={`w-2.5 h-2.5 rounded-full transition-colors duration-300 ${
-                    i === currentSlide ? "bg-blue-500" : "bg-gray-300 hover:bg-gray-400"
-                  }`}
+                  className={`w-2.5 h-2.5 rounded-full transition-colors duration-300 ${i === currentSlide ? "bg-blue-500" : "bg-gray-300 hover:bg-gray-400"
+                    }`}
                   aria-label={`Go to slide ${i + 1}`}
                   aria-current={i === currentSlide ? "true" : "false"}
                 />

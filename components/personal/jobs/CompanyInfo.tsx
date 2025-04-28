@@ -81,7 +81,7 @@ export const CompanyInfo = ({
           {/* 우측 로고 */}
           <div className="w-32 h-20 flex-shrink-0 flex items-center justify-center ml-8">
             <Image
-              src={company.logoKey ? company.logoKey : "/images/logo/logo6.png"}
+              src={company.logoKey ? company.logoKey : "https://meet-u-storage.s3.ap-northeast-2.amazonaws.com/static/logo/logo6.png"}
               alt="회사 로고"
               width={100}
               height={50}

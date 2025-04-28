@@ -50,7 +50,7 @@ export const RelatedCompanies = () => {
             <div className="flex gap-3">
               <div className="w-10 h-10 bg-gray-100 rounded-md flex items-center justify-center overflow-hidden">
                 <Image
-                  src={company.logo || "/images/etc/placeholder.svg"}
+                  src={company.logo || "https://meet-u-storage.s3.ap-northeast-2.amazonaws.com/static/etc/placeholder.svg"}
                   alt={`${company.name} 로고`}
                   width={40}
                   height={40}

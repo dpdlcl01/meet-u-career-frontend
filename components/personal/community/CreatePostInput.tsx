@@ -14,7 +14,7 @@ export const CreatePostInput = ({ onOpen }: CreatePostInputProps) => {
         contentEditable={false}
       >
         <img
-          src="/images/etc/profile.png"
+          src="https://meet-u-storage.s3.ap-northeast-2.amazonaws.com/static/etc/profile.png"
           alt="Profile"
           className="w-10 h-10 rounded-full object-cover"
         />

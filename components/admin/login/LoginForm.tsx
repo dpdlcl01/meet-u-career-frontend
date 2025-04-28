@@ -20,7 +20,7 @@ export const LoginForm = () => {
 
   // 세션에 저장된 이메일 복구
   useEffect(() => {
-    const savedEmail = localStorage.getItem("savedAdminId");
+    const savedEmail = sessionStorage.getItem("savedAdminId");
     if (savedEmail) {
       setEmail(savedEmail);
       setRememberMe(true);
@@ -59,9 +59,9 @@ export const LoginForm = () => {
 
           // 로그인 성공 후 아이디 저장
           if (rememberMe) {
-            localStorage.setItem("savedAdminId", email);
+            sessionStorage.setItem("savedAdminId", email);
           } else {
-            localStorage.removeItem("savedAdminId");
+            sessionStorage.removeItem("savedAdminId");
           }
 
           await fetchMyInfo();

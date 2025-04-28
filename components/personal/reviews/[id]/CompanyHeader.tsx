@@ -26,7 +26,7 @@ export const CompanyHeader = ({
           <div className="flex flex-col md:flex-row gap-6">
             <div className="w-[120px] h-[120px] bg-white rounded-md border flex items-center justify-center overflow-hidden">
               <Image
-                src={logoKey || "/images/etc/placeholder.svg"}
+                src={logoKey || "https://meet-u-storage.s3.ap-northeast-2.amazonaws.com/static/etc/placeholder.svg"}
                 alt={`${companyName} 로고`}
                 width={100}
                 height={40}

@@ -38,7 +38,7 @@ export const JobDetailContent = ({
   useEffect(() => {
     const fetchJobPosting = async () => {
       try {
-        const response = await apiClient.get(`/api/jobpostings/${jobId}`);
+        const response = await apiClient.get(`/api/personal/job/${jobId}`);
         const data: JobPostingType = response.data.data;
         setJobPosting(data);
 
@@ -196,11 +196,10 @@ export const JobDetailContent = ({
               className="flex flex-col justify-center items-center w-14 h-12 border border-gray-300 rounded-md text-sm text-gray-600 hover:text-gray-800"
             >
               <Star
-                className={`h-4 w-4 mb-0.5 ${
-                  jobPosting.bookmarked
-                    ? "text-yellow-400 fill-yellow-400"
-                    : "text-gray-600"
-                }`}
+                className={`h-4 w-4 mb-0.5 ${jobPosting.bookmarked
+                  ? "text-yellow-400 fill-yellow-400"
+                  : "text-gray-600"
+                  }`}
               />
               <span className="text-xs">{jobPosting.bookmarkCount}</span>
             </button>

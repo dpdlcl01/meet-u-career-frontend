@@ -25,7 +25,7 @@ export const JobCard = ({
   useEffect(() => {
     if (!thumbnailUrl || thumbnailUrl.trim() === "") {
       const randomNumber = Math.floor(Math.random() * 15) + 1;
-      setRandomThumbnail(`/images/thumbnail/thumbnail_${randomNumber}.jpg`);
+      setRandomThumbnail(`https://meet-u-storage.s3.ap-northeast-2.amazonaws.com/static/thumbnail/thumbnail_${randomNumber}.jpg`);
     }
   }, [thumbnailUrl]);
 

@@ -18,7 +18,7 @@ const LoginLeftPanel = memo(({ buttonLabel }: { buttonLabel: string }) => (
     {/* 로고 */}
     <div className="flex flex-col items-center justify-center">
       <Image
-        src="/images/login/login_03.png"
+        src="https://meet-u-storage.s3.ap-northeast-2.amazonaws.com/static/login/login_03.png"
         alt="Login Logo"
         width={360}
         height={280}

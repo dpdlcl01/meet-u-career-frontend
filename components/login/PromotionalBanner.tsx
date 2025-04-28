@@ -15,7 +15,7 @@ export const PromotionalBanner = () => {
         </div>
         <div className="absolute right-2 bottom-0">
           <Image
-            src="/images/etc/placeholder.svg?height=40&width=60"
+            src="https://meet-u-storage.s3.ap-northeast-2.amazonaws.com/static/etc/placeholder.svg?height=40&width=60"
             alt="Promotional illustration"
             width={60}
             height={40}

@@ -9,7 +9,7 @@ export const RegisterHeader = () => {
         <div className="flex items-center gap-2">
           <Link href="/" className="text-blue-600 font-bold text-xl">
             <Image
-              src="/images/logo/logo6.png"
+              src="https://meet-u-storage.s3.ap-northeast-2.amazonaws.com/static/logo/logo6.png"
               alt="로고"
               width={120}
               height={35}

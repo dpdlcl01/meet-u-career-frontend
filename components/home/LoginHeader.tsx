@@ -14,9 +14,9 @@ import { useSearchStore } from "@/hooks/useSearchStore";
 
 export const LoginHeader = () => {
   const router = useRouter();
-  const [notificationOpen, setNotificationOpen] = useState(false);
-  const [chatOpen, setChatOpen] = useState(false);
-  const [profileOpen, setProfileOpen] = useState(false);
+  const [notificationOpen, setNotificationOpen] = useState<boolean>(false);
+  const [chatOpen, setChatOpen] = useState<boolean>(false);
+  const [profileOpen, setProfileOpen] = useState<boolean>(false);
 
   const { userInfo } = useUserStore(); // 내 정보
 
@@ -86,7 +86,7 @@ export const LoginHeader = () => {
         <div className="flex items-center gap-4">
           <Link href="/" className="text-blue-600 font-bold text-2xl">
             <Image
-              src="/images/logo/logo6.png"
+              src="https://meet-u-storage.s3.ap-northeast-2.amazonaws.com/static/logo/logo6.png"
               alt="로고"
               width={120}
               height={35}
@@ -142,7 +142,7 @@ export const LoginHeader = () => {
             >
               <div className="relative h-7 w-7 rounded-full overflow-hidden">
                 <Image
-                  src="/images/etc/placeholder.svg?height=40&width=40"
+                  src="https://meet-u-storage.s3.ap-northeast-2.amazonaws.com/static/etc/placeholder.svg?height=40&width=40"
                   alt="프로필 이미지"
                   width={40}
                   height={40}

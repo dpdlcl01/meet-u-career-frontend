@@ -40,7 +40,7 @@ interface PostData {
 
 export const PostFeed = ({ selectedHashtags, onOpenFilterModal }: PostFeedProps) => {
   const { userInfo } = useUserStore();
-  const profileImageUrl = userInfo?.profileImage || "/images/etc/profile.png";
+  const profileImageUrl = userInfo?.profileImage || "https://meet-u-storage.s3.ap-northeast-2.amazonaws.com/static/etc/profile.png";
   const userName = userInfo?.name ?? "";
 
   const [posts, setPosts] = useState<PostData[]>([]);
@@ -94,7 +94,7 @@ export const PostFeed = ({ selectedHashtags, onOpenFilterModal }: PostFeedProps)
         onSelectHashtag={handleSelectHashtag}
         onSelectAll={handleSelectAll}
       />
-      
+
       {/* ✅ CreatePostInput은 onOpen만 받음 */}
       <CreatePostInput onOpen={() => setIsCreatePostModalOpen(true)} />
 
@@ -112,32 +112,32 @@ export const PostFeed = ({ selectedHashtags, onOpenFilterModal }: PostFeedProps)
         const hashtag = tagName ? `#${tagName}` : "";
         return selectedTags.includes(hashtag);
       }).map(post => {
-          const tagName = TAG_ID_TO_NAME[post.tagId];
-          const hashtags = tagName ? [`#${tagName}`] : [];
+        const tagName = TAG_ID_TO_NAME[post.tagId];
+        const hashtags = tagName ? [`#${tagName}`] : [];
 
-          return (
-            <Post
-              key={post.id}
-              post={{
-                id: post.id,
-                author: {
-                  name: `user${post.accountId}`,
-                  avatar: post.profileImageUrl || "/images/etc/profile.png",
-                },
-                content: post.content,
-                image: post.postImageUrl,
-                imageKey: post.postImageKey ?? null,
-                likes: post.likeCount,
-                isLiked: post.isLiked ?? false,
-                comments: post.commentCount,
-                tags: hashtags,
-                likers: [],
-                commentsList: [],
-                createdAt: post.createdAt,
-              }}
-            />
-          );
-        })}
+        return (
+          <Post
+            key={post.id}
+            post={{
+              id: post.id,
+              author: {
+                name: `user${post.accountId}`,
+                avatar: post.profileImageUrl || "https://meet-u-storage.s3.ap-northeast-2.amazonaws.com/static/etc/profile.png",
+              },
+              content: post.content,
+              image: post.postImageUrl,
+              imageKey: post.postImageKey ?? null,
+              likes: post.likeCount,
+              isLiked: post.isLiked ?? false,
+              comments: post.commentCount,
+              tags: hashtags,
+              likers: [],
+              commentsList: [],
+              createdAt: post.createdAt,
+            }}
+          />
+        );
+      })}
     </div>
   );
 };

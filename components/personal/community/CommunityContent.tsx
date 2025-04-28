@@ -67,7 +67,7 @@ export const CommunityContent = () => {
       {isCreatePostModalOpen && (
         <CreatePostModal
           onClose={handleCloseCreatePostModal}
-          profileImageUrl="/images/etc/profile.png" // 기본 프로필 이미지
+          profileImageUrl="https://meet-u-storage.s3.ap-northeast-2.amazonaws.com/static/etc/profile.png" // 기본 프로필 이미지
           userName="User1"               // 기본 사용자 이름
         />
       )}

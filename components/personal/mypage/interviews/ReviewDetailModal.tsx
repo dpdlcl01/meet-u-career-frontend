@@ -74,7 +74,7 @@ export function ReviewDetailModal({
         <div className="flex flex-col md:flex-row gap-6 my-4">
           {/* 좌측 정보 */}
           <div className="flex flex-col items-center min-w-[120px]">
-            <Image src={review.logo || "/images/etc/placeholder.svg"} alt={review.company} width={60} height={60} className="rounded-md border mb-2" />
+            <Image src={review.logo || "https://meet-u-storage.s3.ap-northeast-2.amazonaws.com/static/etc/placeholder.svg"} alt={review.company} width={60} height={60} className="rounded-md border mb-2" />
             <div className="font-semibold text-base text-center">{review.position}</div>
             <div className="text-xs text-gray-500 mt-1">{review.jobCategory || "-"}</div>
             <div className="text-xs text-gray-500 mt-1">{careerLevelMap[review.careerLevel ?? 0]}</div>

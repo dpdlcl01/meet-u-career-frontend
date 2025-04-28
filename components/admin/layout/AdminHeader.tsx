@@ -49,7 +49,7 @@ export default function AdminHeader() {
         <div className="flex items-center space-x-8">
           <Link href="/admin/dashboard" className="text-xl font-semibold">
             <Image
-              src="/images/logo/logo_admin_re.png"
+              src="https://meet-u-storage.s3.ap-northeast-2.amazonaws.com/static/logo/logo_admin_re.png"
               alt="로고"
               width={120}
               height={35}

@@ -1,66 +1,60 @@
+"use client";
+
 import { useEffect, useState } from "react";
 import { apiClient } from "@/api/apiClient";
-import { useUserStore } from "@/store/useUserStore";
-import { useAuthStore } from "@/store/useAuthStore";
+import { toast } from "@/components/ui/use-toast";
 
 export interface Room {
-  roomId: number;             // DB에서 숫자로 내려오는 방 ID
+  roomId: number;
+  companyId: number;
   businessAccountId: number;
   personalAccountId: number;
-  companyName: string;
+  status: number;
   unreadCount: number;
 }
 
 export function useChatRooms() {
-  const { accessToken } = useAuthStore();
-  const { userInfo } = useUserStore();
-
   const [chatRooms, setChatRooms] = useState<Room[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchRooms = async () => {
+    (async () => {
       try {
-        const resp = await apiClient.get<{ data: Room[] }>(
-          "/api/chat/rooms",
-          {
-            headers: {
-              Authorization: `Bearer ${accessToken}`,
-            },
-          }
-        );
-        setChatRooms(resp.data.data);
-      } catch (err: any) {
-        setError(err.message || "채팅방 조회 실패");
+        const resp = await apiClient.get<{ data: any[] }>("/api/chat/rooms");
+        const mapped: Room[] = resp.data.data.map((r) => ({
+          roomId: r.id,
+          companyId: r.companyId,
+          businessAccountId: r.businessAccountId,
+          personalAccountId: r.personalAccountId,
+          status: r.status,
+          unreadCount: r.unreadCount,
+        }));
+        setChatRooms(mapped);
+      } catch (e) {
+        console.error("❌ 채팅방 리스트 가져오기 실패", e);
+        setError("채팅방을 불러오는데 실패했습니다.");
       } finally {
         setLoading(false);
       }
-    };
-
-    if (accessToken && userInfo) {
-      fetchRooms();
-    }
-  }, [accessToken, userInfo]);
+    })();
+  }, []);
 
   const markRoomAsRead = async (roomId: number) => {
     try {
-      await apiClient.post(
-        `/api/chat/rooms/${roomId}/read`,
-        {},
-        {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-        }
-      );
+      await apiClient.post(`/api/chat/rooms/${roomId}/read`);
       setChatRooms((prev) =>
-        prev.map((r) =>
-          r.roomId === roomId ? { ...r, unreadCount: 0 } : r
+        prev.map((room) =>
+          room.roomId === roomId ? { ...room, unreadCount: 0 } : room
         )
       );
-    } catch {
-      /* 무시 */
+    } catch (e) {
+      console.warn("읽음 처리 실패", e);
+      toast({
+        title: "오류",
+        description: "읽음 처리 중 오류가 발생했습니다.",
+        variant: "destructive",
+      });
     }
   };
 

@@ -23,7 +23,7 @@ export const CompanySidebar = ({ companyId, activeTab = "intro" }: CompanySideba
         <div className="flex justify-center mb-4">
           <div className="w-32 h-12 relative">
             <Image
-              src="/images/etc/placeholder.svg?height=48&width=128"
+              src="https://meet-u-storage.s3.ap-northeast-2.amazonaws.com/static/etc/placeholder.svg?height=48&width=128"
               alt="현대자동차 로고"
               width={128}
               height={48}

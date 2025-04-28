@@ -19,7 +19,7 @@ export const PersonalLoginForm = () => {
 
   // 저장된 아이디 복구
   useEffect(() => {
-    const savedUserId = localStorage.getItem("savedUserId");
+    const savedUserId = sessionStorage.getItem("savedUserId");
     if (savedUserId) {
       setUserId(savedUserId);
       setRememberMe(true);
@@ -70,9 +70,9 @@ export const PersonalLoginForm = () => {
 
           // 로그인 성공 후 아이디 저장
           if (rememberMe) {
-            localStorage.setItem("savedUserId", userId);
+            sessionStorage.setItem("savedUserId", userId);
           } else {
-            localStorage.removeItem("savedUserId");
+            sessionStorage.removeItem("savedUserId");
           }
 
           // 사용자 정보 가져오기
