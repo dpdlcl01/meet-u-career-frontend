@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation"
 import { z } from "zod"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
+import { Controller } from "react-hook-form";
 
 // window 타입 확장 (다음 주소 API)
 declare global {
@@ -34,7 +35,7 @@ const businessRegisterSchema = z.object({
     .min(8, "설립일을 입력해주세요")
     .regex(/^\d{8}$/, "YYYYMMDD 형식으로 입력해주세요"),
   companyType: z.enum(["일반", "벤처기업", "공공기관/비영리법인"]),
-  loginId: z
+  userId: z
     .string()
     .min(4, "4~20자의 영문, 숫자, 특수문자 '_'사용가능")
     .max(20, "4~20자의 영문, 숫자, 특수문자 '_'사용가능")
@@ -49,6 +50,10 @@ const businessRegisterSchema = z.object({
     ),
   confirmPassword: z.string(),
   email: z.string().email("올바른 이메일 주소를 입력해주세요."),
+  phone: z
+  .string()
+  .min(10, "전화번호를 입력해주세요")
+  .regex(/^01[016789]-\d{3,4}-\d{4}$/, "올바른 휴대폰 번호 형식이 아닙니다"),
   website: z.string().optional(),
   industry: z.string().min(1, "업종은 필수 입력입니다."),
   allConsent: z.boolean(),
@@ -65,6 +70,7 @@ const businessRegisterSchema = z.object({
 export type BusinessRegisterFormData = z.infer<typeof businessRegisterSchema>;
 export const BusinessRegistrationForm = () => {
 
+  const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [fileUploaded, setFileUploaded] = useState(false);
   const [fileName, setFileName] = useState("");
@@ -72,7 +78,7 @@ export const BusinessRegistrationForm = () => {
   const [companyAddress, setCompanyAddress] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [loginIdMsg, setUserIdMsg] = useState<string | null>(null);
+  const [userIdMsg, setUserIdMsg] = useState<string | null>(null);
   const [emailCheckMsg, setEmailCheckMsg] = useState<string | null>(null);
   const [laterVerification, setLaterVerification] = useState(false);
   
@@ -88,6 +94,7 @@ export const BusinessRegistrationForm = () => {
     handleSubmit,
     setValue,
     trigger,
+    control,
     formState: { errors, isSubmitting },
     watch,
   } = useForm<BusinessRegisterFormData>({
@@ -96,6 +103,7 @@ export const BusinessRegistrationForm = () => {
     defaultValues: {
       companyType: "일반",
       allConsent: false,
+      phone: "",
       serviceConsent: false,
       privacyConsent: false,
       marketingEmailConsent: false,
@@ -305,6 +313,7 @@ export const BusinessRegistrationForm = () => {
     try {
       const response = await apiClient.post("/api/account/business/signup", {
         ...data,
+        name: data.companyName,
         foundingDate: `${data.foundingDate.slice(0, 4)}-${data.foundingDate.slice(4, 6)}-${data.foundingDate.slice(6, 8)}`,
         website: data.website || "",
       });
@@ -650,22 +659,22 @@ export const BusinessRegistrationForm = () => {
 
             {/* 아이디 */}
             <div>
-              <label htmlFor="loginId" className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="userId" className="block text-sm font-medium text-gray-700 mb-1">
                 아이디
               </label>
               <input
                 type="text"
-                id="loginId"
+                id="userId"
                 placeholder="4~20자의 영문, 숫자, 특수문자 '_'사용가능"
                 className={`w-full px-3 py-2.5 border ${
-                  errors.loginId ? "border-red-500" : "border-gray-300"
+                  errors.userId ? "border-red-500" : "border-gray-300"
                 } rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500`}
-                {...register("loginId")}
+                {...register("userId")}
               />
-              {errors.loginId && <p className="text-red-500 text-xs mt-1">{errors.loginId.message}</p>}
-              {loginIdMsg && (
-                <p className={`text-xs mt-1 ${loginIdMsg.includes("사용 가능") ? "text-green-500" : "text-red-500"}`}>
-                  {loginIdMsg}
+              {errors.userId && <p className="text-red-500 text-xs mt-1">{errors.userId.message}</p>}
+              {userIdMsg && (
+                <p className={`text-xs mt-1 ${userIdMsg.includes("사용 가능") ? "text-green-500" : "text-red-500"}`}>
+                  {userIdMsg}
                 </p>
               )}
             </div>
@@ -720,6 +729,22 @@ export const BusinessRegistrationForm = () => {
               </div>
               {errors.confirmPassword && <p className="text-red-500 text-xs mt-1">{errors.confirmPassword.message}</p>}
             </div>
+
+            {/* 전화번호 */}
+            <div>
+              <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-1">
+                전화번호
+              </label>
+              <input
+                type="text"
+                id="phone"
+                placeholder="010-0000-0000"
+                className={`w-full px-3 py-2.5 border ${errors.phone ? "border-red-500" : "border-gray-300"} rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500`}
+                {...register("phone")}
+              />
+              {errors.phone && <p className="text-red-500 text-xs mt-1">{errors.phone.message}</p>}
+            </div>
+
 
             {/* 이메일 */}
             <div>
@@ -796,80 +821,95 @@ export const BusinessRegistrationForm = () => {
 
 
             {/* 약관 동의 */}
-            <div className="space-y-3 border-t pt-6">
-              <label className="flex items-center">
-                <input
-                  type="checkbox"
-                  className="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-                  checked={allConsent}
-                  onChange={handleAllConsentChange}
-                  {...register("allConsent")}
-                />
-                <span className="ml-2 text-sm font-medium">전체 동의</span>
-              </label>
-              
-              <div className="pl-6 space-y-2">
-                <label className="flex items-center">
-                  <input
-                    type="checkbox"
-                    className="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-                    {...register("serviceConsent")}
-                  />
-                  <span className="ml-2 text-sm">
-                    [필수] 서비스 이용약관 동의 
-                    <button type="button" className="ml-1 text-blue-500 underline text-xs">보기</button>
-                  </span>
-                </label>
-                
-                <label className="flex items-center">
-                  <input
-                    type="checkbox"
-                    className="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-                    {...register("privacyConsent")}
-                  />
-                  <span className="ml-2 text-sm">
-                    [필수] 개인정보 수집 및 이용 동의
-                    <button type="button" className="ml-1 text-blue-500 underline text-xs">보기</button>
-                  </span>
-                </label>
-                
-                <label className="flex items-center">
-                  <input
-                    type="checkbox"
-                    className="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-                    {...register("marketingEmailConsent")}
-                  />
-                  <span className="ml-2 text-sm">
-                    [선택] 마케팅 목적 이메일 수신 동의
-                    <button type="button" className="ml-1 text-blue-500 underline text-xs">보기</button>
-                  </span>
-                </label>
-                
-                <label className="flex items-center">
-                  <input
-                    type="checkbox"
-                    className="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-                    {...register("marketingSmsConsent")}
-                  />
-                  <span className="ml-2 text-sm">
-                    [선택] 마케팅 목적 SMS 수신 동의
-                    <button type="button" className="ml-1 text-blue-500 underline text-xs">보기</button>
-                  </span>
-                </label>
-                
-                <label className="flex items-center">
-                  <input
-                    type="checkbox"
-                    className="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-                    {...register("thirdPartyConsent")}
-                  />
-                  <span className="ml-2 text-sm">
-                    [선택] 제3자 정보제공 동의
-                    <button type="button" className="ml-1 text-blue-500 underline text-xs">보기</button>
-                  </span>
-                </label>
-              </div>
-            </div>
+            {/* 약관 동의 */}
+    <div className="space-y-3 border-t pt-6">
+    <Controller
+      name="allConsent"
+      control={control}
+      render={({ field }) => (
+        <label className="flex items-center">
+          <input
+            type="checkbox"
+            className="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+            checked={field.value}
+            onChange={(e) => {
+              const checked = e.target.checked;
+              field.onChange(checked); // allConsent 값 변경
+              setValue("serviceConsent", checked);
+              setValue("privacyConsent", checked);
+              setValue("marketingEmailConsent", checked);
+              setValue("marketingSmsConsent", checked);
+              setValue("thirdPartyConsent", checked);
+            }}
+          />
+          <span className="ml-2 text-sm font-medium">전체 동의</span>
+        </label>
+      )}
+    />
+
+    <div className="pl-6 space-y-2">
+      <label className="flex items-center">
+        <input
+          type="checkbox"
+          className="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+          {...register("serviceConsent")}
+        />
+        <span className="ml-2 text-sm">
+          [필수] 서비스 이용약관 동의 
+          <button type="button" className="ml-1 text-blue-500 underline text-xs">보기</button>
+        </span>
+      </label>
+
+      <label className="flex items-center">
+        <input
+          type="checkbox"
+          className="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+          {...register("privacyConsent")}
+        />
+        <span className="ml-2 text-sm">
+          [필수] 개인정보 수집 및 이용 동의
+          <button type="button" className="ml-1 text-blue-500 underline text-xs">보기</button>
+        </span>
+      </label>
+
+      <label className="flex items-center">
+        <input
+          type="checkbox"
+          className="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+          {...register("marketingEmailConsent")}
+        />
+        <span className="ml-2 text-sm">
+          [선택] 마케팅 목적 이메일 수신 동의
+          <button type="button" className="ml-1 text-blue-500 underline text-xs">보기</button>
+        </span>
+      </label>
+
+      <label className="flex items-center">
+        <input
+          type="checkbox"
+          className="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+          {...register("marketingSmsConsent")}
+        />
+        <span className="ml-2 text-sm">
+          [선택] 마케팅 목적 SMS 수신 동의
+          <button type="button" className="ml-1 text-blue-500 underline text-xs">보기</button>
+        </span>
+      </label>
+
+      <label className="flex items-center">
+        <input
+          type="checkbox"
+          className="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+          {...register("thirdPartyConsent")}
+        />
+        <span className="ml-2 text-sm">
+          [선택] 제3자 정보제공 동의
+          <button type="button" className="ml-1 text-blue-500 underline text-xs">보기</button>
+        </span>
+      </label>
+    </div>
+  </div>
+
 
             {/* 제출 버튼 */}
             <div>
