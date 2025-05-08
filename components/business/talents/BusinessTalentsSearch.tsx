@@ -81,7 +81,7 @@ export const BusinessTalentsSearch = () => {
       setLoading(true); // Start loading
       try {
         const response = await apiClient.get<ApiResult<TalentDto[]>>(
-          "/business/talents"
+          "/api/business/talents"
         );
         const dtos = response.data.data || []; // 데이터가 없을 경우 빈 배열로 설정
         const enriched = dtos.map((d) => ({

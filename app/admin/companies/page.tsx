@@ -5,7 +5,7 @@ import AdminHeader from "@/components/admin/layout/AdminHeader";
 import CompanyManagement from "@/components/admin/companies/CompanyManagement";
 
 export default function CompaniesPage() {
-  const isChecking = useAuthGuard("admin"); // admin만 접근 가능
+  const isChecking = useAuthGuard(["admin", "super"]);
 
   if (isChecking) return null; // 검사 중일 땐 아무것도 렌더링하지 않음
 

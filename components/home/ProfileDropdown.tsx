@@ -19,7 +19,7 @@ const ProfileDropdown = () => {
     try {
       // 서버에 로그아웃 요청 (refreshToken 삭제)
       await apiClient.post(
-        "/api/personal/auth/logout",
+        "/api/auth/logout",
         {},
         { withCredentials: true }
       );

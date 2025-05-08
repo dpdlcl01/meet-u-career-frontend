@@ -7,6 +7,7 @@ import { ApplicantsSearch } from "./ApplicantsSearch";
 import { ApplicantsStatistics } from "./ApplicantsStatistics";
 import type { ApplicantStatus } from "@/types/applicants";
 import { apiClient } from "@/api/apiClient";
+import { statusMap, statusColors } from "@/types/applicants";
 
 interface Applicant {
   id: number;
@@ -16,13 +17,6 @@ interface Applicant {
   date: string;
   status: ApplicantStatus;
 }
-
-const statusColors: Record<ApplicantStatus, string> = {
-  서류검토중: "bg-blue-100 text-blue-800",
-  서류합격: "bg-green-100 text-green-800",
-  서류불합격: "bg-red-100 text-red-800",
-  면접완료: "bg-amber-100 text-amber-800",
-};
 
 type SortDirection = "asc" | "desc" | null;
 
@@ -83,9 +77,8 @@ export const ApplicantsTable = ({
               <ChevronUp className="w-4 h-4 text-blue-500" />
             ) : (
               <ChevronDown
-                className={`w-4 h-4 ${
-                  sortDirection === "desc" ? "text-blue-500" : "text-gray-500"
-                }`}
+                className={`w-4 h-4 ${sortDirection === "desc" ? "text-blue-500" : "text-gray-500"
+                  }`}
               />
             )}
           </button>
@@ -109,9 +102,8 @@ export const ApplicantsTable = ({
             <div className="p-4 flex items-center">{applicant.date}</div>
             <div className="p-4 flex items-center">
               <span
-                className={`px-2 py-1 rounded-full text-xs font-medium ${
-                  statusColors[applicant.status]
-                }`}
+                className={`px-2 py-1 rounded-full text-xs font-medium ${statusColors[applicant.status]
+                  }`}
               >
                 {applicant.status}
               </span>
@@ -150,7 +142,7 @@ export const ApplicantsTableWithSearch = ({
           email: applicant.email,
           position: applicant.position || "포지션 정보 없음",
           date: applicant.appliedDate?.replace(/-/g, ".") || "날짜 없음",
-          status: applicant.status || "서류검토중",
+          status: statusMap[applicant.status] || "서류검토중",
         }));
         setApplicants(formatted);
       } catch (error) {

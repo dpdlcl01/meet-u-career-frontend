@@ -1,7 +1,5 @@
 import { CompanySidebar } from "../CompanySidebar"
 import { SalaryOverview } from "./SalaryOverview"
-import { SalaryByPosition } from "./SalaryByPosition"
-import { SalaryComparison } from "./SalaryComparison"
 import { SalaryDisclaimer } from "./SalaryDisclaimer"
 
 interface CompanySalaryContentProps {
@@ -17,9 +15,7 @@ export const CompanySalaryContent = ({ companyId }: CompanySalaryContentProps) =
         </div>
         <div className="flex-1">
           <h1 className="text-xl font-bold mb-6">연봉정보</h1>
-          <SalaryOverview />
-          <SalaryByPosition />
-          <SalaryComparison />
+          <SalaryOverview companyId={companyId} />
           <SalaryDisclaimer />
         </div>
       </div>

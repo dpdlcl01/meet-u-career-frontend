@@ -1,6 +1,6 @@
 import { CompanySidebar } from "@/components/personal/company/CompanySidebar";
 import { CompanyOverview } from "./CompanyOverview";
-import { CompanyIntroduction } from "./CompanyIntroduction";
+// import { CompanyIntroduction } from "./CompanyIntroduction";
 import { CurrentJobPostings } from "./CurrentJobPostings";
 import { EmployeeStatistics } from "./EmployeeStatistics";
 import { WorkforceSalary } from "./WorkforceSalary";
@@ -22,11 +22,11 @@ export const CompanyIntroContent = ({
         </div>
         <div className="flex-1">
           <h1 className="text-xl font-bold mb-6">기본 기업정보</h1>
-          <CompanyOverview />
-          <CompanyIntroduction />
-          <CurrentJobPostings />
-          <EmployeeStatistics />
-          <WorkforceSalary />
+          <CompanyOverview companyId={companyId} />
+          {/* <CompanyIntroduction /> */}
+          <CurrentJobPostings companyId={companyId} />
+          <EmployeeStatistics companyId={companyId} />
+          <WorkforceSalary companyId={companyId} />
           <CompanyNews />
           <CompanyFooter />
         </div>

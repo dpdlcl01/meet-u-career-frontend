@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { ChevronDown, LogOut, User, Settings } from "lucide-react";
+import { ChevronDown, LogOut } from "lucide-react";
 import Image from "next/image";
 import { apiClient } from "@/api/apiClient";
 import { useAuthStore } from "@/store/useAuthStore";
@@ -51,7 +51,7 @@ export default function AdminHeader() {
     try {
       // 서버에 로그아웃 요청 (refreshToken 삭제)
       await apiClient.post(
-        "/api/personal/auth/logout",
+        "/api/auth/logout",
         {},
         { withCredentials: true }
       );
@@ -91,84 +91,79 @@ export default function AdminHeader() {
           <nav className="hidden md:flex space-x-1">
             <Link
               href="/admin/dashboard"
-              className={`px-3 py-2 font-medium ${
-                pathname.includes("/admin/dashboard")
-                  ? "border-b-2 border-white"
-                  : "hover:bg-blue-800/20"
-              }`}
+              className={`px-3 py-2 font-medium ${pathname.includes("/admin/dashboard")
+                ? "border-b-2 border-white"
+                : "hover:bg-blue-800/20"
+                }`}
             >
               대시보드
             </Link>
             <Link
               href="/admin/companies"
-              className={`px-3 py-2 font-medium ${
-                pathname.includes("/admin/companies")
-                  ? "border-b-2 border-white"
-                  : "hover:bg-blue-800/20"
-              }`}
+              className={`px-3 py-2 font-medium ${pathname.includes("/admin/companies")
+                ? "border-b-2 border-white"
+                : "hover:bg-blue-800/20"
+                }`}
             >
               기업 관리
             </Link>
             <Link
               href="/admin/jobs"
-              className={`px-3 py-2 font-medium ${
-                pathname.includes("/admin/jobs")
-                  ? "border-b-2 border-white"
-                  : "hover:bg-blue-800/20"
-              }`}
+              className={`px-3 py-2 font-medium ${pathname.includes("/admin/jobs")
+                ? "border-b-2 border-white"
+                : "hover:bg-blue-800/20"
+                }`}
             >
               공고 관리
             </Link>
             <Link
               href="/admin/members"
-              className={`px-3 py-2 font-medium ${
-                pathname.includes("/admin/members")
-                  ? "border-b-2 border-white"
-                  : "hover:bg-blue-800/20"
-              }`}
+              className={`px-3 py-2 font-medium ${pathname.includes("/admin/members")
+                ? "border-b-2 border-white"
+                : "hover:bg-blue-800/20"
+                }`}
             >
               회원 관리
             </Link>
             <Link
               href="/admin/community"
-              className={`px-3 py-2 font-medium ${
-                pathname.includes("/admin/community")
-                  ? "border-b-2 border-white"
-                  : "hover:bg-blue-800/20"
-              }`}
+              className={`px-3 py-2 font-medium ${pathname.includes("/admin/community")
+                ? "border-b-2 border-white"
+                : "hover:bg-blue-800/20"
+                }`}
             >
               커뮤니티 관리
             </Link>
             <Link
               href="/admin/payments"
-              className={`px-3 py-2 font-medium ${
-                pathname.includes("/admin/payments")
-                  ? "border-b-2 border-white"
-                  : "hover:bg-blue-800/20"
-              }`}
+              className={`px-3 py-2 font-medium ${pathname.includes("/admin/payments")
+                ? "border-b-2 border-white"
+                : "hover:bg-blue-800/20"
+                }`}
             >
               결제 관리
             </Link>
             <Link
               href="/admin/admins"
-              className={`px-3 py-2 font-medium ${
-                pathname.includes("/admin/admins")
-                  ? "border-b-2 border-white"
-                  : "hover:bg-blue-800/20"
-              }`}
+              className={`px-3 py-2 font-medium ${pathname.includes("/admin/admins")
+                ? "border-b-2 border-white"
+                : "hover:bg-blue-800/20"
+                }`}
             >
               관리자 관리
             </Link>
-            <Link
-              href="/admin/logs"
-              className={`px-3 py-2 font-medium ${
-                pathname.includes("/admin/logs")
+            {
+              userInfo?.role === "SUPER" &&
+              <Link
+                href="/admin/logs"
+                className={`px-3 py-2 font-medium ${pathname.includes("/admin/logs")
                   ? "border-b-2 border-white"
                   : "hover:bg-blue-800/20"
-              }`}
-            >
-              로그 관리
-            </Link>
+                  }`}
+              >
+                로그 관리
+              </Link>
+            }
           </nav>
         </div>
 
@@ -185,9 +180,8 @@ export default function AdminHeader() {
             <span>{userInfo?.name}</span>
             <ChevronDown
               size={16}
-              className={`transition-transform duration-200 ${
-                isOpen ? "rotate-180" : ""
-              }`}
+              className={`transition-transform duration-200 ${isOpen ? "rotate-180" : ""
+                }`}
             />
           </button>
 

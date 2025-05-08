@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Heart, Share2 } from "lucide-react";
@@ -10,15 +10,58 @@ interface CompanySidebarProps {
   activeTab?: "intro" | "reviews" | "salary" | "jobs";
 }
 
+
+
+export interface CompanyInfoDTO {
+  id: number;
+  createdAt: string;
+  updatedAt: string;
+  name: string;
+  businessNumber: string;
+  representativeName: string;
+  industry: string;
+  foundedDate: string;
+  numEmployees: number;
+  revenue: number;
+  website: string;
+  logoKey: string;
+  address: string;
+  companyType: string;
+  corpCode: string;
+  operatingProfit: number;
+  status: number;
+  avgAnnualSalary: number;
+}
+
 export const CompanySidebar = ({
   companyId,
   activeTab = "intro",
 }: CompanySidebarProps) => {
   const [isLiked, setIsLiked] = useState(false);
+  const [company, setCompany] = useState<CompanyInfoDTO | null>(null);
+
+  useEffect(() => {
+    if (!companyId) return;
+    fetch(`/api/personal/companies/${companyId}/info`)
+      .then((res) => res.json())
+      .then((data) => {
+        setCompany(data.data);
+      });
+  }, [companyId]);
 
   const toggleLike = () => {
     setIsLiked(!isLiked);
   };
+
+  if (!company) return <div>Loading...</div>;
+
+  // Formatters
+  const formatDate = (dateStr: string) => {
+    if (!dateStr) return "";
+    const date = new Date(dateStr);
+    return `${date.getFullYear()}년 ${date.getMonth() + 1}월 ${date.getDate()}일 설립`;
+  };
+  const formatNumber = (num: number) => (num || 0).toLocaleString();
 
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-100">
@@ -29,8 +72,8 @@ export const CompanySidebar = ({
             style={{ marginBottom: "80px", marginTop: "10px" }}
           >
             <Image
-              src="/images/etc/placeholder.svg?height=48&width=128"
-              alt="현대자동차 로고"
+              src={`/images/etc/${company.logoKey}?height=48&width=128`}
+              alt={company.name}
               width={128}
               height={48}
               className="object-contain"
@@ -41,13 +84,13 @@ export const CompanySidebar = ({
           className="text-base font-bold text-center"
           style={{ marginBottom: "5px" }}
         >
-          로이컨설팅
+          {company.name}
         </h2>
         <p
           className="text-xs text-gray-500 text-center mb-3"
           style={{ marginBottom: "10px" }}
         >
-          기업정보
+          {formatDate(company.foundedDate)}
         </p>
         <div className="flex justify-between items-center relative z-10">
           <button

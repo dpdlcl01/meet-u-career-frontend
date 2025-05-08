@@ -1,11 +1,53 @@
 "use client";
 
 import { InfoIcon } from "lucide-react";
-import { useState } from "react";
 import Link from "next/link";
+import { useEffect, useState } from "react";
 
-export const WorkforceSalary = () => {
+export interface CompanyInfoDTO {
+  id: number;
+  createdAt: string;
+  updatedAt: string;
+  name: string;
+  businessNumber: string;
+  representativeName: string;
+  industry: string;
+  foundedDate: string;
+  numEmployees: number;
+  revenue: number;
+  website: string;
+  logoKey: string;
+  address: string;
+  companyType: string;
+  corpCode: string;
+  operatingProfit: number;
+  status: number;
+  avgAnnualSalary: number;
+}
+
+interface WorkforceSalaryProps {
+  companyId: string;
+}
+
+export const WorkforceSalary = ({ companyId }: WorkforceSalaryProps) => {
   const [showTooltip, setShowTooltip] = useState<string | null>(null);
+  const [company, setCompany] = useState<CompanyInfoDTO | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+
+  useEffect(() => {
+    if (!companyId) return;
+    setLoading(true);
+    fetch(`/api/personal/companies/${companyId}/info`)
+      .then((res) => res.json())
+      .then((data) => {
+        setCompany(data.data);
+      })
+      .finally(() => setLoading(false));
+  }, [companyId]);
+
+  const formatNumber = (num?: number) => (num || 0).toLocaleString();
+
+  if (loading || !company) return null;
 
   const toggleTooltip = (id: string) => {
     if (showTooltip === id) {
@@ -42,7 +84,7 @@ export const WorkforceSalary = () => {
         <div className="text-center">
           <p className="text-sm text-gray-500 mb-2">전체 사원수</p>
           <p className="text-xl font-bold">
-            1,131<span className="text-sm font-normal ml-1">명</span>
+            {formatNumber(company.numEmployees)}<span className="text-sm font-normal ml-1">명</span>
           </p>
         </div>
 
@@ -62,7 +104,7 @@ export const WorkforceSalary = () => {
             </button>
           </div>
           <p className="text-xl font-bold">
-            11,781<span className="text-sm font-normal ml-1">만원</span>
+            {formatNumber(Math.floor((company.avgAnnualSalary || 0) / 10000))}<span className="text-sm font-normal ml-1">만원</span>
           </p>
         </div>
 

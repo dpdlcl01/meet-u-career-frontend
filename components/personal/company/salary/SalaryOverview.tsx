@@ -1,10 +1,58 @@
 "use client"
 
-import { useState } from "react"
-import { InfoIcon, TrendingUp } from "lucide-react"
+import { useEffect, useState } from "react";
+import { InfoIcon, TrendingUp } from "lucide-react";
 
-export const SalaryOverview = () => {
+interface CompanyInfoDTO {
+  id: number;
+  createdAt: string;
+  updatedAt: string;
+  name: string;
+  businessNumber: string;
+  representativeName: string;
+  industry: string;
+  foundedDate: string;
+  numEmployees: number;
+  revenue: number;
+  website: string;
+  logoKey: string;
+  address: string;
+  companyType: string;
+  corpCode: string;
+  operatingProfit: number;
+  status: number;
+  avgAnnualSalary: number;
+}
+
+interface SalaryOverviewProps {
+  companyId: string;
+}
+
+export const SalaryOverview = ({ companyId }: SalaryOverviewProps) => {
   const [showTooltip, setShowTooltip] = useState<string | null>(null)
+
+  const [company, setCompany] = useState<CompanyInfoDTO | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+
+  useEffect(() => {
+    if (!companyId) return;
+    setLoading(true);
+    fetch(`/api/personal/companies/${companyId}/info`)
+      .then((res) => res.json())
+      .then((data) => {
+        setCompany(data.data);
+      })
+      .finally(() => setLoading(false));
+  }, [companyId]);
+
+  const toManwon = (num?: number) => Math.floor((num || 0) / 10000);
+  const formatNumber = (num?: number) => toManwon(num).toLocaleString();
+
+  if (loading || !company) return null;
+
+  const avgAnnualSalary = company.avgAnnualSalary || 0;
+  const minSalary = Math.round(avgAnnualSalary * 0.75);
+  const maxSalary = Math.round(avgAnnualSalary * 1.8);
 
   const toggleTooltip = (id: string) => {
     if (showTooltip === id) {
@@ -20,7 +68,7 @@ export const SalaryOverview = () => {
 
       <div className="bg-white border rounded-lg p-6 mb-6">
         <div className="flex items-center mb-4">
-          <h3 className="text-base font-medium">2023년 평균연봉</h3>
+          <h3 className="text-base font-medium">2024년 평균연봉</h3>
           <div className="flex ml-2">
             <span className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full mr-1">계약직 포함</span>
             <span className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full">임원 제외</span>
@@ -42,7 +90,7 @@ export const SalaryOverview = () => {
 
         <div className="text-center mb-6">
           <p className="text-4xl font-bold text-blue-600">
-            11,781<span className="text-xl font-normal ml-1">만원</span>
+            {formatNumber(avgAnnualSalary)}<span className="text-xl font-normal ml-1">만원</span>
           </p>
         </div>
 
@@ -57,8 +105,8 @@ export const SalaryOverview = () => {
             <div className="absolute right-[35%] top-0 h-4 w-4 bg-white border-2 border-blue-500 rounded-full -mt-1 -ml-1"></div>
           </div>
           <div className="flex justify-between text-sm">
-            <span>5,236만원</span>
-            <span>11,403만원</span>
+            <span>{formatNumber(minSalary)}만원</span>
+            <span>{formatNumber(maxSalary)}만원</span>
           </div>
         </div>
 
@@ -108,7 +156,7 @@ export const SalaryOverview = () => {
         </div>
       </div>
 
-      <div className="bg-white border rounded-lg p-6">
+      {/* <div className="bg-white border rounded-lg p-6">
         <h3 className="text-base font-medium mb-4">연도별 평균연봉 추이</h3>
         <div className="h-64 relative">
           <div className="flex h-48 items-end justify-around">
@@ -148,7 +196,7 @@ export const SalaryOverview = () => {
         <div className="text-center text-sm text-green-500 font-medium">
           2023년 동종 업종 평균 대비 <span className="font-bold">+44.52%</span> 높은 수준
         </div>
-      </div>
+      </div> */}
     </div>
   )
 }

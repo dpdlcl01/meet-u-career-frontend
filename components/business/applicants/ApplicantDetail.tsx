@@ -3,12 +3,12 @@
 import {
   type ResumeApplicationDetail,
   type ApplicantStatus,
+  statusMap,
 } from "@/types/applicants";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ApplicantDetailHeader } from "./ApplicantDetailHeader";
 import { BasicInfoCard } from "./BasicInfoCard";
-import { ProfilePhotoCard } from "./ProfilePhotoCard";
 import { StatusManagementCard } from "./StatusManagementCard";
 import { ResumeContent } from "./ResumeContent";
 import { CoverLetterContent } from "./CoverLetterContent";
@@ -62,10 +62,10 @@ export default function ApplicantDetail({
 
   return (
     <div className="space-y-6">
-      <ApplicantDetailHeader />
+      <ApplicantDetailHeader resumeId={applicant.resumeId} resumeTitle={applicant.resumeTitle} />
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 space-y-6">
-          <BasicInfoCard applicant={applicant} status={status} />
+          <BasicInfoCard applicant={applicant} status={statusMap[applicant.applicationStatus]} />
           <Tabs defaultValue="resume">
             <TabsList className="grid grid-cols-3 mb-4">
               <TabsTrigger value="resume">이력서</TabsTrigger>
@@ -95,11 +95,7 @@ export default function ApplicantDetail({
         </div>
 
         <div className="space-y-6">
-          <ProfilePhotoCard profileImageUrl={applicant.profileImageUrl} />
-          <StatusManagementCard
-            currentStatus={status}
-            onStatusChange={() => {}}
-          />
+          <StatusManagementCard applicationId={applicant.applicationId} currentStatus={statusMap[applicant.applicationStatus]} onStatusChange={() => { }} />
         </div>
       </div>
     </div>

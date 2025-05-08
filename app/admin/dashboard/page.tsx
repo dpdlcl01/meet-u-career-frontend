@@ -11,7 +11,8 @@ import { apiClient } from "@/api/apiClient";
 import { toast } from "@/components/ui/use-toast";
 
 export default function AdminDashboardPage() {
-  const isChecking = useAuthGuard(["admin", "super"]);
+  const isChecking = useAuthGuard(["admin", "super"]); // SUPER, ADMIN 둘 다 접근 가능
+
   const [activeTab, setActiveTab] = useState<string>("user");
   const [isDownloading, setIsDownloading] = useState<boolean>(false);
 
@@ -69,11 +70,10 @@ export default function AdminDashboardPage() {
           <button
             onClick={handleDownloadReport}
             disabled={isDownloading}
-            className={`${
-              isDownloading
-                ? "bg-gray-400 cursor-not-allowed"
-                : "bg-blue-500 hover:bg-blue-600"
-            } text-white px-4 py-2 rounded-md text-sm`}
+            className={`${isDownloading
+              ? "bg-gray-400 cursor-not-allowed"
+              : "bg-blue-500 hover:bg-blue-600"
+              } text-white px-4 py-2 rounded-md text-sm`}
           >
             {isDownloading ? "다운로드 중..." : "보고서 생성"}
           </button>

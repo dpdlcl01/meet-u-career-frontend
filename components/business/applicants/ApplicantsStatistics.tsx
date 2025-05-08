@@ -59,11 +59,11 @@ export const ApplicantsStatistics = ({
   jobPostingId = 0,
 }: ApplicantsStatisticsProps) => {
   const [stats, setStats] = useState<Record<string, number>>({
-    total: 0,
-    서류검토중: 0,
-    서류합격: 0,
-    서류불합격: 0,
-    면접완료: 0,
+    totalApplicants: 0,
+    documentReviewing: 0,
+    documentPassed: 0,
+    documentFailed: 0,
+    interviewCompleted: 0,
   });
 
   useEffect(() => {
@@ -75,13 +75,13 @@ export const ApplicantsStatistics = ({
         setStats(response.data.data);
       } catch (error) {
         console.error("통계 정보 불러오기 실패:", error);
-        // 실패 시 기본값 유지
+
         setStats({
-          total: 0,
-          서류검토중: 0,
-          서류합격: 0,
-          서류불합격: 0,
-          면접완료: 0,
+          totalApplicants: 0,
+          documentReviewing: 0,
+          documentPassed: 0,
+          documentFailed: 0,
+          interviewCompleted: 0,
         });
       }
     };
@@ -93,7 +93,7 @@ export const ApplicantsStatistics = ({
     <div className="mb-6 grid grid-cols-5 gap-4">
       <StatCard
         icon={<Users className="h-5 w-5" />}
-        count={stats.total}
+        count={stats.totalApplicants}
         label="총 지원자"
         color="text-gray-700"
         status="all"
@@ -102,7 +102,7 @@ export const ApplicantsStatistics = ({
       />
       <StatCard
         icon={<Clock className="h-5 w-5" />}
-        count={stats["서류검토중"]}
+        count={stats.documentReviewing}
         label="서류검토중"
         color="text-blue-500"
         status="서류검토중"
@@ -111,7 +111,7 @@ export const ApplicantsStatistics = ({
       />
       <StatCard
         icon={<CheckCircle className="h-5 w-5" />}
-        count={stats["서류합격"]}
+        count={stats.documentPassed}
         label="서류합격"
         color="text-green-500"
         status="서류합격"
@@ -120,7 +120,7 @@ export const ApplicantsStatistics = ({
       />
       <StatCard
         icon={<XCircle className="h-5 w-5" />}
-        count={stats["서류불합격"]}
+        count={stats.documentFailed}
         label="서류불합격"
         color="text-red-500"
         status="서류불합격"
@@ -129,7 +129,7 @@ export const ApplicantsStatistics = ({
       />
       <StatCard
         icon={<CircleDot className="h-5 w-5" />}
-        count={stats["면접완료"]}
+        count={stats.interviewCompleted}
         label="면접완료"
         color="text-amber-500"
         status="면접완료"
