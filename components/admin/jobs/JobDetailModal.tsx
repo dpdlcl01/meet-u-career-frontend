@@ -21,6 +21,7 @@ export default function JobDetailModal({
       "0": "반려",
       "1": "승인",
       "2": "대기중",
+      "3": "차단됨",
       
     }
     return statusMap[String(status)] ?? "알 수 없음"
