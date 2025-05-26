@@ -35,18 +35,17 @@ export const BusinessHeader = () => {
   const router = useRouter();
 
   const [isOpen, setIsOpen] = useState(false);
-  const [isNotificationOpen, setIsNotificationOpen] = useState(false);
-  const [isChatOpen, setIsChatOpen] = useState(false);
+  const [isNotificationOpen, setIsNotificationOpen] = useState<boolean>(false);
+  const [isChatOpen, setIsChatOpen] = useState<boolean>(false);
 
   const { clearTokens } = useAuthStore();
   const { userInfo, clearUserInfo } = useUserStore();
-  const { notifications, isLoaded, clearNotifications } = useNotificationStore();
+  const { notifications, isLoaded, clearNotifications, setNotifications } = useNotificationStore();
+  const hasUnreadNotification =
+    isLoaded && notifications.some((n) => n.isRead === 0);
 
   const { chatRooms } = useChatRooms(); // ✅ useChatRooms 사용
   const unreadChatCount = chatRooms.reduce((acc, room) => acc + room.unreadCount, 0); // ✅ 합계 계산
-
-  const hasUnreadNotification =
-    isLoaded && notifications.some((n) => n.isRead === 0);
 
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -75,6 +74,21 @@ export const BusinessHeader = () => {
     }
   };
 
+  // 헤더 마운트 시 알림 미리 불러오기
+  useEffect(() => {
+    if (!isLoaded) {
+      (async () => {
+        try {
+          const res = await apiClient.get("/api/notification/list");
+          setNotifications(res.data.data || []);
+        } catch (error) {
+          console.error("알림 미리 불러오기 실패:", error);
+        }
+      })();
+    }
+  }, [isLoaded, setNotifications]);
+
+  // 외부 클릭 시 드롭다운 닫기
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent): void => {
       if (

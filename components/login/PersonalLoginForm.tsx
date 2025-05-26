@@ -12,7 +12,7 @@ export const PersonalLoginForm = () => {
   const [userId, setUserId] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [rememberMe, setRememberMe] = useState<boolean>(false);
-  const [isPending, setIsPending] = useState(false);
+  const [isPending, setIsPending] = useState<boolean>(false);
   const [userIdError, setUserIdError] = useState<string>("");
   const [passwordError, setPasswordError] = useState<string>("");
   const [serverError, setServerError] = useState<string>("");

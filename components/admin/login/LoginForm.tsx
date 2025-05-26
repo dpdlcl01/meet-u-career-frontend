@@ -8,16 +8,16 @@ import { apiClient } from "@/api/apiClient";
 
 export const LoginForm = () => {
   const router = useRouter();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [rememberMe, setRememberMe] = useState(false);
-  const [isPending, setIsPending] = useState(false);
-  const [emailError, setEmailError] = useState("");
-  const [passwordError, setPasswordError] = useState("");
-  const [serverError, setServerError] = useState("");
+  const [email, setEmail] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+  const [rememberMe, setRememberMe] = useState<boolean>(false);
+  const [isPending, setIsPending] = useState<boolean>(false);
+  const [emailError, setEmailError] = useState<string>("");
+  const [passwordError, setPasswordError] = useState<string>("");
+  const [serverError, setServerError] = useState<string>("");
   const { setTokens } = useAuthStore();
 
-  // 세션에 저장된 이메일 복구
+  // 저장된 이메일 복구
   useEffect(() => {
     const savedEmail = localStorage.getItem("savedAdminId");
     if (savedEmail) {
@@ -78,7 +78,7 @@ export const LoginForm = () => {
           // 사용자 정보 가져오기
           await fetchMyInfo();
 
-          // 대시보드 페이지로 이동.
+          // 대시보드 페이지로 이동
           router.push("/admin/dashboard");
         } else {
           setServerError("로그인 중 오류가 발생했습니다. (1)");

@@ -1,6 +1,5 @@
 "use client";
 
-import type React from "react";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { fetchMyInfo } from "@/api/fetchMyInfo";
@@ -10,10 +9,10 @@ import { apiClient } from "@/api/apiClient";
 
 export const BusinessLoginForm = () => {
   const router = useRouter();
-  const [userId, setUserId] = useState("");
-  const [password, setPassword] = useState("");
-  const [rememberMe, setRememberMe] = useState(false);
-  const [isPending, setIsPending] = useState(false);
+  const [userId, setUserId] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+  const [rememberMe, setRememberMe] = useState<boolean>(false);
+  const [isPending, setIsPending] = useState<boolean>(false);
   const [userIdError, setUserIdError] = useState<string>("");
   const [passwordError, setPasswordError] = useState<string>("");
   const [serverError, setServerError] = useState<string>("");
@@ -61,7 +60,7 @@ export const BusinessLoginForm = () => {
         }
       );
 
-      if (response.data.msg == "success") {
+      if (response.data.msg === "success") {
         const { accessToken, refreshToken } = response.data.data || {};
 
         if (accessToken && refreshToken) {
@@ -80,8 +79,8 @@ export const BusinessLoginForm = () => {
           // 사용자 정보 가져오기
           await fetchMyInfo();
 
-          // 기업 대시보드로 이동
-          router.push("/business/dashboard");
+          // 메인 페이지로 이동
+          router.push("/");
         } else {
           setServerError("로그인 중 오류가 발생했습니다. (1)");
         }
