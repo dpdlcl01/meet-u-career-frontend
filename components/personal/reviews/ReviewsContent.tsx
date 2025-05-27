@@ -10,7 +10,7 @@ export const ReviewsContent = () => {
   const [searchKeyword, setSearchKeyword] = useState("")
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen">
       <ReviewsHero onSearch={(keyword) => setSearchKeyword(keyword)} />
 
       <div className="max-w-[1200px] mx-auto px-4 flex gap-8">

@@ -15,7 +15,7 @@ export default function ReviewsPage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-white">
+    <div className="min-h-screen flex flex-col bg-[#fcfcfd]">
       {userInfo ? <LoginHeader /> : <Header />}
       <MainNavigation />
       <main className="flex-1">

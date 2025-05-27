@@ -13,7 +13,7 @@ export const Footer = () => {
   ];
 
   return (
-    <footer className="bg-white border-t py-6">
+    <footer className="bg-[#f0f2f5] border-t py-6">
       <div className="max-w-[1200px] mx-auto px-4">
         <div className="flex flex-wrap gap-6 mb-6">
           <ul className="flex flex-wrap gap-5 text-sm text-gray-600">
@@ -43,15 +43,6 @@ export const Footer = () => {
           <p className="text-xs mb-4">
             Copyright (c) MeetU(주). All rights reserved.
           </p>
-        </div>
-
-        <div className="flex gap-2 justify-end">
-          <div className="bg-gray-200 p-2 rounded-md hover:bg-gray-300 w-8 h-8 flex items-center justify-center">
-            <span className="sr-only">미</span>
-          </div>
-          <div className="bg-gray-200 p-2 rounded-md hover:bg-gray-300 w-8 h-8 flex items-center justify-center">
-            <span className="sr-only">카</span>
-          </div>
         </div>
       </div>
     </footer>

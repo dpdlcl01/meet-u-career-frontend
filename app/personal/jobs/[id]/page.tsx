@@ -51,20 +51,12 @@ export default function JobDetailPage({ params }: JobDetailPageProps) {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-white">
-      {/* {isScrolled ? (
-        <MiniHeader />
-      ) : (
-        <>
-          {userInfo ? <LoginHeader /> : <Header />}
-          <MainNavigation />
-        </>
-      )} */}
+    <div className="min-h-screen flex flex-col bg-[#fcfcfd]">
       {userInfo ? <LoginHeader /> : <Header />}
       <MainNavigation />
 
       {/* 본문 */}
-      <main className="flex-1 bg-white">
+      <main className="flex-1">
         <div className="max-w-[1200px] mx-auto px-4 py-6">
           <div className="flex flex-col md:flex-row gap-6">
             <div className="hidden md:block w-16">

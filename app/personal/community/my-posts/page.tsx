@@ -12,7 +12,7 @@ export default function MyPostsPage() {
   if (isChecking) return null; // 검사 중일 땐 아무것도 렌더링하지 않음
 
   return (
-    <div className="min-h-screen flex flex-col bg-gray-50">
+    <div className="min-h-screen flex flex-col">
       <Header />
       <MainNavigation />
       <main className="flex-1">

@@ -6,10 +6,10 @@ import Image from "next/image";
 import Link from "next/link";
 
 const gradients = [
-  "bg-gradient-to-r from-pink-500 via-red-500 to-yellow-500", // 1열
-  "bg-gradient-to-r from-green-400 via-blue-500 to-purple-500", // 2열
-  "bg-gradient-to-r from-yellow-400 via-red-500 to-pink-500", // 3열
-  "bg-gradient-to-r from-blue-400 via-cyan-500 to-teal-500", // 4열
+  "bg-gradient-to-r from-blue-800 via-blue-600 to-blue-400",   // 1열
+  "bg-gradient-to-r from-blue-700 via-sky-500 to-blue-300", // 2열
+  "bg-gradient-to-r from-indigo-800 via-blue-700 to-cyan-500", // 3열
+  "bg-gradient-to-r from-blue-900 via-indigo-700 to-blue-500" // 4열
 ];
 
 export const JobCard = ({
@@ -39,14 +39,18 @@ export const JobCard = ({
   const gradientClass = gradients[parseInt(index.toString(), 10) % 4];
 
   return (
-    <div className="group relative rounded-2xl overflow-hidden border bg-white transition-all hover:shadow-md">
+    <div
+      className="group relative rounded-2xl overflow-hidden border bg-white transition-shadow duration-300 shadow-[0_0_12px_rgba(20,52,150,0.08)] hover:shadow-[0_0_16px_rgba(20,52,150,0.2)]"
+    >
       <Link href={`/personal/jobs/${index}`} className="block">
         {/* 상단 고정 그라데이션 선 */}
-        <div className={`h-1 w-full ${gradientClass}`} />
+        <div
+          className={`h-1 w-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 ${gradientClass}`}
+        />
 
         {/* 상단 회사명 */}
         <div className="p-3 text-center">
-          <div className="text-sm font-semibold text-gray-700">{company}</div>
+          <div className="text-lg font-semibold text-gray-700">{company}</div>
         </div>
 
         {/* 타이틀 */}

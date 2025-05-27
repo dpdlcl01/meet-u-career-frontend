@@ -33,7 +33,7 @@ export default function PreventActionWrapper({ children }: Props) {
     <div
       onContextMenu={preventAction}
       onDragStart={preventAction}
-      className="min-h-screen"
+      className="min-h-screen bg-[#fcfcfd]"
     >
       {accessToken && <NotificationHandler />}
       {children}
